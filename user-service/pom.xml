@@ -17,4 +17,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+
+        <!-- 引入通用模块 -->
+        <dependency>
+            <groupId>com.goal</groupId>
+            <artifactId>shop-common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
 </project>

@@ -43,7 +43,7 @@
     </properties>
 
 
-    <!--锁定版本-->
+    <!--锁定版本：仅是管理，使用时仍需引入-->
     <dependencyManagement>
         <dependencies>
             <!--https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies/2.3.3.RELEASE-->
@@ -86,7 +86,8 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
-                <scope>provided</scope>
+                <!-- 仅在编译时生效，运行时不打包 -->
+                <!-- <scope>provided</scope> -->
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
