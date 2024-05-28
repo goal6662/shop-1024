@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goal.user.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.goal.user.domain.User">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="name" column="name" jdbcType="VARCHAR"/>
+            <result property="pwd" column="pwd" jdbcType="VARCHAR"/>
+            <result property="headImg" column="head_img" jdbcType="VARCHAR"/>
+            <result property="slogan" column="slogan" jdbcType="VARCHAR"/>
+            <result property="sex" column="sex" jdbcType="TINYINT"/>
+            <result property="points" column="points" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="mail" column="mail" jdbcType="VARCHAR"/>
+            <result property="secret" column="secret" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name,pwd,
+        head_img,slogan,sex,
+        points,create_time,mail,
+        secret
+    </sql>
+</mapper>
