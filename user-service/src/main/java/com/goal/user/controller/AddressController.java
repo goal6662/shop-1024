@@ -1,5 +1,6 @@
 package com.goal.user.controller;
 
+import com.goal.user.service.AddressService;
 import com.goal.user.service.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,11 +14,11 @@ import javax.annotation.Resource;
 public class AddressController {
 
     @Resource
-    private UserService userService;
+    private AddressService addressService;
 
     @GetMapping("{id}")
     public Object detail(@PathVariable Long id) {
-        return userService.getById(id);
+        return addressService.getById(id);
     }
 
 
