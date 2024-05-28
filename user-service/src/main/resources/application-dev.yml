@@ -1,0 +1,4 @@
+shop:
+  db:
+    uri: ip:port
+    pwd: password
