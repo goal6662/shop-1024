@@ -7,7 +7,7 @@ spring:
     name: user-service   # 微服务名称
   # 数据库
   datasource:
-    url: jdbc://${shop.db.uri}/shop_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://${shop.db.uri}/shop_user?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: ${shop.db.pwd}
     # mysql8
@@ -24,3 +24,8 @@ mybatis-plus:
 logging:
   level:
     root: info
+
+app:
+  config:
+    api:
+      version: v1
