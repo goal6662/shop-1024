@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.goal.config.SwaggerConfig
+  com.goal.config.SwaggerConfig,\
+  com.goal.exception.GlobalExceptionHandler
