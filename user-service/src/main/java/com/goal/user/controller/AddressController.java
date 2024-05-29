@@ -1,6 +1,8 @@
 package com.goal.user.controller;
 
+import com.goal.user.domain.Address;
 import com.goal.user.service.AddressService;
+import com.goal.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -20,11 +22,14 @@ public class AddressController {
     private AddressService addressService;
 
     @ApiOperation("根据id查找地址详情")
-    @GetMapping("{id}")
-    public Object detail(
+    @GetMapping("find/{id}")
+    public Result<Address> detail(
             @ApiParam(value = "地址id", required = true)
             @PathVariable Long id) {
-        return addressService.getById(id);
+
+        Address address = addressService.getById(id);
+
+        return Result.success(address);
     }
 
 
