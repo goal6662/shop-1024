@@ -2,3 +2,7 @@ shop:
   db:
     uri: ip:port
     pwd: password
+  redis:
+    host: ip
+    port: port
+    pwd: password

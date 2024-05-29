@@ -32,6 +32,7 @@
         <spring.cloud.version>Hoxton.SR8</spring.cloud.version>
         <alibaba.cloud.version>2.2.1.RELEASE</alibaba.cloud.version>
         <mybatisplus.boot.starter.version>3.4.2</mybatisplus.boot.starter.version>
+        <kaptcha.boot.starter>1.1.0</kaptcha.boot.starter>
         <lombok.version>1.18.16</lombok.version>
         <commons.lang3.version>3.9</commons.lang3.version>
         <commons.codec.version>1.15</commons.codec.version>
@@ -110,6 +111,12 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-boot-starter</artifactId>
                 <version>${springfox.boot.starter.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>kaptcha-spring-boot-starter</artifactId>
+                <version>${kaptcha.boot.starter}</version>
             </dependency>
 
         </dependencies>

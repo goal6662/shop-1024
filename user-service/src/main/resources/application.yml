@@ -13,7 +13,11 @@ spring:
     # mysql8
     driver-class-name: com.mysql.cj.jdbc.Driver
 #    driver-class-name: com.mysql.jdbc.Driver # mysql8 一下不加 cj
-
+  # redis 配置
+  redis:
+    host: ${shop.redis.host}
+    port: ${shop.redis.port}
+    password: ${shop.redis.pwd}
 mybatis-plus:
   configuration:
     # mp日志
