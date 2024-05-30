@@ -37,8 +37,9 @@
         <commons.lang3.version>3.9</commons.lang3.version>
         <commons.codec.version>1.15</commons.codec.version>
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
-        <docker.image.prefix>shop-cloud</docker.image.prefix>
+        <hutool.version>5.7.5</hutool.version>
 
+        <docker.image.prefix>shop-cloud</docker.image.prefix>
         <!--跳过单元测试-->
         <skipTests>true</skipTests>
     </properties>
@@ -47,6 +48,13 @@
     <!--锁定版本：仅是管理，使用时仍需引入-->
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+
             <!--https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies/2.3.3.RELEASE-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>

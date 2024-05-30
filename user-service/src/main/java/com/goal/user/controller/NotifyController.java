@@ -1,12 +1,19 @@
 package com.goal.user.controller;
 
+import com.goal.enums.BizCodeEnum;
+import com.goal.enums.SendCodeEnum;
 import com.goal.user.common.RedisConstants;
+import com.goal.user.service.NotifyService;
 import com.goal.utils.CommonUtil;
+import com.goal.utils.Result;
 import com.google.code.kaptcha.Producer;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -25,13 +32,16 @@ import java.util.concurrent.TimeUnit;
 @Api("验证码服务")
 @RestController
 @RequestMapping("api/${app.config.api.version}/user")
-public class ValidateController {
+public class NotifyController {
 
     @Resource
     private Producer captchaProducer;
 
     @Resource(name = "stringRedisTemplate")
     private StringRedisTemplate redisTemplate;
+
+    @Resource
+    private NotifyService notifyService;
 
     @RequestMapping("captcha")
     public void getCaptcha(HttpServletRequest request, HttpServletResponse response) {
@@ -71,6 +81,32 @@ public class ValidateController {
         log.info("缓存验证码, key：{}", key);
 
         return key;
+    }
+
+
+    @GetMapping("send_code")
+    public Result sendRegisterCode(@RequestParam(value = "to") String to,
+                                   @RequestParam(value = "captcha") String captcha,
+                                   HttpServletRequest request) {
+
+        String key = getCaptchaKey(request);
+
+        // 获取缓存验证码
+        String cacheCaptcha = redisTemplate.opsForValue().get(key);
+
+        // 判断图形验证码是否一致
+        if (StringUtils.isNoneBlank(captcha, cacheCaptcha) && captcha.equals(cacheCaptcha)) {
+            // 成功
+            // 删除缓存
+            redisTemplate.delete(key);
+
+            // 发送验证码到邮箱
+            return notifyService.sendCode(SendCodeEnum.USER_REGISTER, to);
+
+        } else {
+            return Result.fail(BizCodeEnum.CODE_CAPTCHA_ERROR);
+        }
+
     }
 
 }

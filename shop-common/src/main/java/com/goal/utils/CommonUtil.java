@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.Random;
 
 public class CommonUtil {
 
@@ -61,7 +62,7 @@ public class CommonUtil {
     /**
      * MD5加密
      * @param data 加密数据
-     * @return
+     * @return 加密数据
      */
     public static String MD5(String data) {
         try {
@@ -77,6 +78,26 @@ public class CommonUtil {
         }
 
         return null;
+    }
+
+    /**
+     * 生成随机验证码
+     * @param length 验证码长度
+     * @return
+     */
+    public static String getRandomCode(int length) {
+
+        String sources = "0123456789";
+
+        Random random = new Random();
+        StringBuilder builder = new StringBuilder();
+
+        int up = sources.length() - 1;
+        for (int i = 0; i < length; i++) {
+            builder.append(sources.charAt(random.nextInt(up)));
+        }
+
+        return builder.toString();
     }
 
 }
