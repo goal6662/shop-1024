@@ -67,8 +67,6 @@ public class NotifyController {
 
     /**
      * Redis验证码的key
-     * @param request
-     * @return
      */
     private String getCaptchaKey(HttpServletRequest request) {
 
@@ -84,6 +82,11 @@ public class NotifyController {
     }
 
 
+    /**
+     * 要求：1、60s内不可重复发送 2、缓存发送的验证码
+     * @param to 注册邮箱
+     * @param captcha 图形验证码
+     */
     @GetMapping("send_code")
     public Result sendRegisterCode(@RequestParam(value = "to") String to,
                                    @RequestParam(value = "captcha") String captcha,
@@ -97,7 +100,7 @@ public class NotifyController {
         // 判断图形验证码是否一致
         if (StringUtils.isNoneBlank(captcha, cacheCaptcha) && captcha.equals(cacheCaptcha)) {
             // 成功
-            // 删除缓存
+            // 删除图形验证码缓存
             redisTemplate.delete(key);
 
             // 发送验证码到邮箱

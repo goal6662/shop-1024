@@ -100,4 +100,12 @@ public class CommonUtil {
         return builder.toString();
     }
 
+    /**
+     * 获取当前时间戳
+     * @return 当前时间戳
+     */
+    public static long getCurrentTimeStamp() {
+        return System.currentTimeMillis();
+    }
+
 }
