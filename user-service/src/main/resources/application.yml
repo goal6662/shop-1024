@@ -33,3 +33,11 @@ app:
   config:
     api:
       version: v1
+
+# aliyunOSS
+aliyun:
+  oss:
+    endpoint: ${aliyun.oss.endpoint}
+    access-key-id: ${aliyun.oss.access-key-id}
+    access-key-secret: ${aliyun.oss.access-key-secret}
+    bucket-name: ${aliyun.oss.bucket-name}

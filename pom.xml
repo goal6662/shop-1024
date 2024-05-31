@@ -38,6 +38,7 @@
         <commons.codec.version>1.15</commons.codec.version>
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
         <hutool.version>5.7.5</hutool.version>
+        <aliyun.oss.version>3.10.2</aliyun.oss.version>
 
         <docker.image.prefix>shop-cloud</docker.image.prefix>
         <!--跳过单元测试-->
@@ -48,6 +49,13 @@
     <!--锁定版本：仅是管理，使用时仍需引入-->
     <dependencyManagement>
         <dependencies>
+
+            <!-- https://help.aliyun.com/zh/oss/developer-reference/java-installation -->
+            <dependency>
+                <groupId>com.aliyun.oss</groupId>
+                <artifactId>aliyun-sdk-oss</artifactId>
+                <version>${aliyun.oss.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>cn.hutool</groupId>
