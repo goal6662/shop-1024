@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Random;
+import java.util.UUID;
 
 public class CommonUtil {
 
@@ -108,4 +109,11 @@ public class CommonUtil {
         return System.currentTimeMillis();
     }
 
+    /**
+     * 生成UUID
+     * @return 替换掉 '-' 的前 32 位
+     */
+    public static String generateUUID() {
+        return UUID.randomUUID().toString().replaceAll("-", "").substring(0, 32);
+    }
 }
