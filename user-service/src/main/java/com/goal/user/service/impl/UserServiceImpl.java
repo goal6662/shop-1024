@@ -2,6 +2,7 @@ package com.goal.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.goal.domain.LoginUser;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
 import com.goal.user.domain.User;
@@ -11,6 +12,7 @@ import com.goal.user.service.NotifyService;
 import com.goal.user.service.UserService;
 import com.goal.user.mapper.UserMapper;
 import com.goal.utils.CommonUtil;
+import com.goal.utils.JwtUtil;
 import com.goal.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
@@ -101,9 +103,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         // 3. 判断账号密码是否一致
         if (cryptPwd.equals(user.getPwd())) {
-            // TODO: 2024/6/1 登录成功，生成token
-
-            return Result.success();
+            // 登录成功，生成token
+            LoginUser loginUser = new LoginUser();
+            BeanUtils.copyProperties(user, loginUser);
+            String token = JwtUtil.genJwtToken(loginUser);
+            return Result.success(token);
         }
 
         return Result.fail(BizCodeEnum.ACCOUNT_PWD_ERROR);
