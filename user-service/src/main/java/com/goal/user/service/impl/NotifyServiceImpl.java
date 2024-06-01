@@ -33,7 +33,7 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public Result sendCode(SendCodeEnum sendCodeEnum, String to) {
 
-        String registerKey = RedisConstants.USER_REGISTER_KEY + to;
+        String registerKey = sendCodeEnum.getCacheKey(to);
 
         String cacheCode = redisTemplate.opsForValue().get(registerKey);
 
@@ -65,5 +65,20 @@ public class NotifyServiceImpl implements NotifyService {
         }
 
         return Result.success();
+    }
+
+    @Override
+    public boolean checkCode(SendCodeEnum sendCodeEnum, String to, String code) {
+        String cacheKey = sendCodeEnum.getCacheKey(to);
+
+        String cacheValue = redisTemplate.opsForValue().get(cacheKey).split("_")[0];
+
+        if (StringUtils.isNotBlank(cacheValue) && code.equals(cacheValue)) {
+            // 验证码匹配
+            redisTemplate.delete(cacheKey);
+            return true;
+        }
+
+        return false;
     }
 }

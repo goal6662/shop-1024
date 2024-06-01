@@ -12,4 +12,7 @@ public interface NotifyService {
      * @return 发送结果
      */
     Result sendCode(SendCodeEnum sendCodeEnum, String to);
+
+    boolean checkCode(SendCodeEnum sendCodeEnum, String to, String code);
+
 }
