@@ -1,5 +1,6 @@
 package com.goal.user.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
 * @author Goal
@@ -58,8 +60,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         user.setCreateTime(new Date());
 
-        // TODO: 2024/5/31 账号唯一性检查
+        // 账号唯一性检查
         boolean isUnique = checkUnique(registerDTO.getMail());
+        if (!isUnique) {
+            return Result.fail(BizCodeEnum.ACCOUNT_REPEAT);
+        }
 
         // 设置密码
         user.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
@@ -86,13 +91,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 检查账号是否唯一
+     *  高并发下可能出现账号重复
+     *  mail 字段的 unique 属性是必须的
      * @param email
      * @return
      */
     private boolean checkUnique(String email) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getMail, email);
 
+        List<User> users = userMapper.selectList(queryWrapper);
 
-        return false;
+        return users.isEmpty();
     }
 }
 
