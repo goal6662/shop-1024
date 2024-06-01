@@ -18,6 +18,11 @@ public enum BizCodeEnum {
     OPS_REPEAT(110002, "重复操作"),
 
     /**
+     * 请求相关
+     */
+    REQ_PARAM_ILLEGAL(160001, "请求参数不合法"),
+
+    /**
      * 验证码相关
      */
     CODE_TO_ERROR(240001, "接收号码不合规"),

@@ -2,6 +2,7 @@ package com.goal.user.controller;
 
 import com.baomidou.mybatisplus.extension.api.R;
 import com.goal.enums.BizCodeEnum;
+import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
 import com.goal.user.service.FileService;
 import com.goal.user.service.UserService;
@@ -44,17 +45,27 @@ public class UserController {
         return Result.fail(BizCodeEnum.FILE_UPLOAD_ERROR);
     }
 
-
     /**
      * 接收JSON格式的数据
-     * @param registerDTO
+     * @param registerDTO  使用json接收数据，后续数据变更仅需修改实体类
      * @return
      */
-    @PostMapping("register")
     @ApiOperation("用户注册")
+    @PostMapping("register")
     public Result register(
             @ApiParam("用户注册对象")
             @RequestBody UserRegisterDTO registerDTO) {
         return userService.register(registerDTO);
     }
+
+
+    @ApiOperation("用户登录")
+    @PostMapping("login")
+    public Result<String> login(
+            @ApiParam("用户登录对象")
+            @RequestBody UserLoginDTO loginDTO
+            ) {
+        return userService.login(loginDTO);
+    }
+
 }

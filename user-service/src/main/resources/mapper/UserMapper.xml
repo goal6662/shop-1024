@@ -23,4 +23,7 @@
         points,create_time,mail,
         secret
     </sql>
+    <select id="getUserByMail" resultType="com.goal.user.domain.User">
+        select secret, pwd from shop_user.user where mail = #{mail}
+    </select>
 </mapper>

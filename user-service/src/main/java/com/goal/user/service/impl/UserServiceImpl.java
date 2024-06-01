@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
 import com.goal.user.domain.User;
+import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
 import com.goal.user.service.NotifyService;
 import com.goal.user.service.UserService;
@@ -80,6 +81,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
 
         return Result.fail(BizCodeEnum.OPS_ERROR);
+    }
+
+    @Override
+    public Result<String> login(UserLoginDTO loginDTO) {
+        if (StringUtils.isAnyBlank(loginDTO.getMail(), loginDTO.getPwd())) {
+            return Result.fail(BizCodeEnum.REQ_PARAM_ILLEGAL);
+        }
+
+        // 1. 根据邮箱查找用户
+        User user = userMapper.getUserByMail(loginDTO.getMail());
+        if (user == null) {
+            return Result.fail(BizCodeEnum.ACCOUNT_UNREGISTER);
+        }
+
+        // 2. 获取密钥，进行加密，匹配密文
+        // 使用用户密钥加密请求密码
+        String cryptPwd = Md5Crypt.md5Crypt(loginDTO.getPwd().getBytes(), user.getSecret());
+
+        // 3. 判断账号密码是否一致
+        if (cryptPwd.equals(user.getPwd())) {
+            // TODO: 2024/6/1 登录成功，生成token
+
+            return Result.success();
+        }
+
+        return Result.fail(BizCodeEnum.ACCOUNT_PWD_ERROR);
     }
 
     /**

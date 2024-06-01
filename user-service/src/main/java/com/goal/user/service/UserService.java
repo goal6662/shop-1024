@@ -2,6 +2,7 @@ package com.goal.user.service;
 
 import com.goal.user.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
 import com.goal.utils.Result;
 
@@ -18,4 +19,11 @@ public interface UserService extends IService<User> {
      * @return
      */
     Result register(UserRegisterDTO registerDTO);
+
+    /**
+     * 用户登录
+     * @param loginDTO
+     * @return
+     */
+    Result<String> login(UserLoginDTO loginDTO);
 }
