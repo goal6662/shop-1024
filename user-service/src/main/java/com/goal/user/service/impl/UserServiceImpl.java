@@ -1,10 +1,15 @@
 package com.goal.user.service.impl;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.domain.LoginUser;
+import com.goal.domain.RefreshableToken;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
+import com.goal.user.common.RedisConstants;
 import com.goal.user.domain.User;
 import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
@@ -18,11 +23,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author Goal
@@ -36,6 +45,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Resource
     private NotifyService notifyService;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Resource
     private UserMapper userMapper;
@@ -106,11 +118,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             // 登录成功，生成token
             LoginUser loginUser = new LoginUser();
             BeanUtils.copyProperties(user, loginUser);
-            String token = JwtUtil.genJwtToken(loginUser);
-            return Result.success(token);
+
+//            return getTokenResult(loginUser);
+            return getRefreshResult(loginUser);
         }
 
         return Result.fail(BizCodeEnum.ACCOUNT_PWD_ERROR);
+    }
+
+    @Override
+    public Result<RefreshableToken> refreshToken(RefreshableToken token) {
+        // 1. 判断缓存是否存在
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(token.getRefreshToken()))) {
+            // 存在
+            DecodedJWT decoded = JwtUtil.parseJwtToken(token.getRefreshToken());
+            LoginUser loginUser = LoginUser.builder()
+                    .id(Long.valueOf(decoded.getSubject()))
+                    .headImg(decoded.getClaim("head_img").asString())
+                    .name(decoded.getClaim("name").asString())
+                    .mail(decoded.getClaim("mail").asString())
+                    .build();
+            Result result = getRefreshResult(loginUser);
+
+            // 删除原有缓存
+            redisTemplate.delete(token.getRefreshToken());
+
+            return result;
+        }
+        return Result.fail(BizCodeEnum.ACCOUNT_LOGIN_EXPIRED);
     }
 
     /**
@@ -134,6 +169,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         List<User> users = userMapper.selectList(queryWrapper);
 
         return users.isEmpty();
+    }
+
+
+    /**
+     * 普通方案
+     */
+    private Result<String> getTokenResult(LoginUser loginUser) {
+        String token = JwtUtil.genJwtToken(loginUser);
+        return Result.success(token);
+    }
+
+    /**
+     * 自动刷新方案
+     * @param loginUser
+     * @return
+     */
+    private Result getRefreshResult(LoginUser loginUser) {
+        String accessToken = JwtUtil.genJwtToken(loginUser);
+        String refreshToken = JwtUtil.genJwtToken(loginUser, RedisConstants.REFRESH_TOKEN_TTL);
+
+        RefreshableToken token = new RefreshableToken(accessToken, refreshToken);
+
+        if (StringUtils.isBlank(token.getExpireTime())) {
+            return Result.fail(BizCodeEnum.OPS_ERROR);
+        }
+
+        // 缓存 refreshToken
+        redisTemplate.opsForValue().set(refreshToken, "1",
+                RedisConstants.REFRESH_TOKEN_TTL, TimeUnit.MILLISECONDS);
+
+        return Result.success(token);
+
     }
 }
 

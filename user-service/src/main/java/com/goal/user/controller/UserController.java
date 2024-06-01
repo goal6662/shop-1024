@@ -1,6 +1,7 @@
 package com.goal.user.controller;
 
 import com.baomidou.mybatisplus.extension.api.R;
+import com.goal.domain.RefreshableToken;
 import com.goal.enums.BizCodeEnum;
 import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 @Api("用户模块")
 @RestController
@@ -66,6 +68,15 @@ public class UserController {
             @RequestBody UserLoginDTO loginDTO
             ) {
         return userService.login(loginDTO);
+    }
+
+    @ApiOperation("自动刷新token")
+    @PostMapping("refresh_token")
+    public Result<RefreshableToken> refreshToken(
+            @ApiParam("刷新token")
+            @RequestBody RefreshableToken token
+            ) {
+        return userService.refreshToken(token);
     }
 
 }

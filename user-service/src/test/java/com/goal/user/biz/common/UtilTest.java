@@ -25,7 +25,7 @@ public class UtilTest {
                 "XQiOjE3MTcyNTExNzgsImV4cCI6MTcxNzg1NTk3OH0.83WLBPKYA6Q00eqO5Kdl-SIvHPVr9Pu-G-D3_facw_g";
 
         DecodedJWT decodedJWT = JwtUtil.parseJwtToken(token);
-        System.out.println(decodedJWT.getClaims());
+        System.out.println(decodedJWT.getSubject());
 
     }
 

@@ -39,6 +39,16 @@ public class JwtUtil {
      * @return
      */
     public static String genJwtToken(LoginUser loginUser) {
+        return genJwtToken(loginUser, EXPIRE);
+    }
+
+    /**
+     * 根据用户信息生成token
+     *
+     * @param loginUser
+     * @return
+     */
+    public static String genJwtToken(LoginUser loginUser, long expire) {
         if (loginUser == null) {
             throw new NullPointerException("LoginUser对象为空");
         }
@@ -51,7 +61,7 @@ public class JwtUtil {
                 .withClaim("name", loginUser.getName())
                 .withClaim("mail", loginUser.getMail())
                 .withIssuedAt(new Date())   // 签发时间
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRE))    // 过期时间
+                .withExpiresAt(new Date(System.currentTimeMillis() + expire))    // 过期时间
                 .sign(Algorithm.HMAC256(SECRET));
 
         return TOKEN_PREFIX + token;
@@ -94,6 +104,23 @@ public class JwtUtil {
             return verifier.verify(token);
         } catch (Exception e) {
             log.warn("jwt解析失败，相关用户: {}", subject);
+            return null;
+        }
+    }
+
+    /**
+     * 获取 jwt 有效期
+     * @param token
+     * @return
+     */
+    public static String getExpireTime(String token) {
+        try {
+            // 去除类型信息
+            token = token.substring(token.indexOf(":") + 1);
+
+            return String.valueOf(JWT.decode(token).getExpiresAt().getTime());
+        } catch (Exception e) {
+            log.error("获取jwt有效期失败");
             return null;
         }
     }

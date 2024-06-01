@@ -1,5 +1,6 @@
 package com.goal.user.service;
 
+import com.goal.domain.RefreshableToken;
 import com.goal.user.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.user.domain.dto.UserLoginDTO;
@@ -26,4 +27,12 @@ public interface UserService extends IService<User> {
      * @return
      */
     Result<String> login(UserLoginDTO loginDTO);
+
+
+    /**
+     * 自动刷新 token
+     * @param token
+     * @return
+     */
+    Result<RefreshableToken> refreshToken(RefreshableToken token);
 }
