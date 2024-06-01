@@ -1,7 +1,5 @@
 package com.goal.user.controller;
 
-import com.goal.enums.BizCodeEnum;
-import com.goal.exception.BizException;
 import com.goal.user.domain.Address;
 import com.goal.user.service.AddressService;
 import com.goal.utils.Result;

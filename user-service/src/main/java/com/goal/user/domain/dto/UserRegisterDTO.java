@@ -20,7 +20,7 @@ public class UserRegisterDTO {
      */
     private Integer sex;
 
-    private String email;
+    private String mail;
 
     private String code;
 

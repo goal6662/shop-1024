@@ -8,8 +8,10 @@ import com.goal.user.domain.dto.UserRegisterDTO;
 import com.goal.user.service.NotifyService;
 import com.goal.user.service.UserService;
 import com.goal.user.mapper.UserMapper;
+import com.goal.utils.CommonUtil;
 import com.goal.utils.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -45,7 +47,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public Result register(UserRegisterDTO registerDTO) {
 
-        String email = registerDTO.getEmail();
+        String email = registerDTO.getMail();
         if (StringUtils.isBlank(email)
                 || !notifyService.checkCode(SendCodeEnum.USER_REGISTER, email, registerDTO.getCode())) {
             return Result.fail(BizCodeEnum.CODE_ERROR);
@@ -57,9 +59,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setCreateTime(new Date());
 
         // TODO: 2024/5/31 账号唯一性检查
-        boolean isUnique = checkUnique(registerDTO.getEmail());
-        // TODO: 2024/5/31 设置密码
-        boolean setP;
+        boolean isUnique = checkUnique(registerDTO.getMail());
+
+        // 设置密码
+        user.setSecret("$1$" + CommonUtil.getStringNumRandom(8));
+        String cryptPwd = Md5Crypt.md5Crypt(user.getPwd().getBytes(), user.getSecret());
+        user.setPwd(cryptPwd);
 
         if (this.save(user)) {
             log.info("用户注册成功：{}", user);
