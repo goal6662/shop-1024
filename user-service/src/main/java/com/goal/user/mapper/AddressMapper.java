@@ -11,6 +11,18 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface AddressMapper extends BaseMapper<Address> {
 
+    /**
+     * 查询用户默认收获地址
+     * @param userId 用户ID
+     * @return
+     */
+    Address getDefaultAddressByUserId(Long userId);
+
+    /**
+     * 修改默认收获地址为非默认收获地址
+     * @param id 地址id
+     */
+    void updateDefaultAddressById(Long id);
 }
 
 

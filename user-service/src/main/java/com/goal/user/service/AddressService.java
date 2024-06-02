@@ -2,6 +2,8 @@ package com.goal.user.service;
 
 import com.goal.user.domain.Address;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.goal.user.domain.dto.AddressAddDTO;
+import com.goal.utils.Result;
 
 /**
 * @author Goal
@@ -10,4 +12,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface AddressService extends IService<Address> {
 
+    /**
+     * 新增收获地址
+     * @param addressAddDTO
+     * @return
+     */
+    Result add(AddressAddDTO addressAddDTO);
 }

@@ -1,15 +1,14 @@
 package com.goal.user.controller;
 
+import com.baomidou.mybatisplus.extension.api.R;
 import com.goal.user.domain.Address;
+import com.goal.user.domain.dto.AddressAddDTO;
 import com.goal.user.service.AddressService;
 import com.goal.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -32,5 +31,13 @@ public class AddressController {
         return Result.success(address);
     }
 
+    @ApiOperation("新增收货地址")
+    @PostMapping("add")
+    public Result add(
+            @ApiParam("地址信息")
+            @RequestBody AddressAddDTO addressAddDTO
+            ) {
+        return addressService.add(addressAddDTO);
+    }
 
 }
