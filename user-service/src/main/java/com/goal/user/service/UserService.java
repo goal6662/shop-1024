@@ -1,8 +1,8 @@
 package com.goal.user.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.domain.RefreshableToken;
 import com.goal.user.domain.User;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
 import com.goal.user.domain.vo.UserVO;

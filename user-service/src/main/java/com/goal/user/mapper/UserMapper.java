@@ -1,7 +1,7 @@
 package com.goal.user.mapper;
 
-import com.goal.user.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.goal.user.domain.User;
 
 /**
 * @author Goal

@@ -1,6 +1,5 @@
 package com.goal.user.controller;
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.goal.domain.RefreshableToken;
 import com.goal.enums.BizCodeEnum;
 import com.goal.user.domain.dto.UserLoginDTO;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import java.util.Map;
 
 @Api("用户模块")
 @RestController

@@ -2,7 +2,6 @@ package com.goal.utils;
 
 import org.springframework.util.StringUtils;
 
-import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import java.net.InetAddress;
 import java.net.UnknownHostException;

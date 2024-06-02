@@ -1,7 +1,7 @@
 package com.goal.user.mapper;
 
-import com.goal.user.domain.Address;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.goal.user.domain.Address;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

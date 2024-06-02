@@ -1,7 +1,6 @@
 package com.goal.utils;
 
 import com.goal.enums.BizCodeEnum;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data

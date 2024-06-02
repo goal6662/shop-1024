@@ -1,23 +1,20 @@
 package com.goal.user.service.impl;
 
-import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.api.R;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.domain.LoginUser;
 import com.goal.domain.RefreshableToken;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
 import com.goal.user.common.RedisConstants;
-import com.goal.user.controller.UserController;
 import com.goal.user.domain.User;
 import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
 import com.goal.user.domain.vo.UserVO;
+import com.goal.user.mapper.UserMapper;
 import com.goal.user.service.NotifyService;
 import com.goal.user.service.UserService;
-import com.goal.user.mapper.UserMapper;
 import com.goal.utils.CommonUtil;
 import com.goal.utils.JwtUtil;
 import com.goal.utils.Result;
@@ -33,7 +30,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**

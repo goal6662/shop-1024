@@ -1,6 +1,5 @@
 package com.goal.interceptor;
 
-import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.goal.domain.LoginUser;
 import com.goal.enums.BizCodeEnum;
@@ -19,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
 
         String accessToken = request.getHeader("token");
 
