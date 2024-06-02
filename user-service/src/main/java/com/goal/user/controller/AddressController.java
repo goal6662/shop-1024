@@ -1,8 +1,7 @@
 package com.goal.user.controller;
 
-import com.baomidou.mybatisplus.extension.api.R;
-import com.goal.user.domain.Address;
 import com.goal.user.domain.dto.AddressAddDTO;
+import com.goal.user.domain.vo.AddressVO;
 import com.goal.user.service.AddressService;
 import com.goal.utils.Result;
 import io.swagger.annotations.Api;
@@ -22,13 +21,10 @@ public class AddressController {
 
     @ApiOperation("根据id查找地址详情")
     @GetMapping("find/{id}")
-    public Result<Address> detail(
+    public Result<AddressVO> detail(
             @ApiParam(value = "地址id", required = true)
             @PathVariable Long id) {
-
-        Address address = addressService.getById(id);
-
-        return Result.success(address);
+        return addressService.getDetailById(id);
     }
 
     @ApiOperation("新增收货地址")
@@ -39,5 +35,16 @@ public class AddressController {
             ) {
         return addressService.add(addressAddDTO);
     }
+
+
+    @ApiOperation("删除地址")
+    @DeleteMapping("del/{id}")
+    public Result delete(
+            @ApiParam("地址ID")
+            @PathVariable Long id
+            ) {
+        return addressService.deleteById(id);
+    }
+
 
 }

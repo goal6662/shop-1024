@@ -2,6 +2,7 @@ package com.goal.user.mapper;
 
 import com.goal.user.domain.Address;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author Goal
@@ -23,6 +24,23 @@ public interface AddressMapper extends BaseMapper<Address> {
      * @param id 地址id
      */
     void updateDefaultAddressById(Long id);
+
+    /**
+     * 获取用户的地址信息
+     * @param userId
+     * @param id
+     * @return
+     */
+    Address getUserAddressById(@Param("userId") Long userId,
+                               @Param("id") Long id);
+
+    /**
+     * 删除用户的地址信息
+     * @param id 地址ID
+     * @param userId 用户ID
+     * @return 受影响的行数
+     */
+    int deleteUserAddressById(@Param("id") Long id, @Param("userId") Long userId);
 }
 
 

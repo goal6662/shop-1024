@@ -26,7 +26,16 @@
     <update id="updateDefaultAddressById">
         update shop_user.address set default_status = 0 where id = #{id}
     </update>
+    <delete id="deleteUserAddressById">
+        delete from shop_user.address where user_id = #{userId} and id = #{id}
+    </delete>
     <select id="getDefaultAddressByUserId" resultType="com.goal.user.domain.Address">
         select id from shop_user.address where user_id = #{userId} and default_status = 1
+    </select>
+    <select id="getUserAddressById" resultType="com.goal.user.domain.Address">
+        select id, user_id, default_status, receive_name, phone, province, city, region, detail_address, create_time
+        from
+            shop_user.address
+        where user_id = #{userId} and id = #{id}
     </select>
 </mapper>

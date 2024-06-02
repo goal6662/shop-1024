@@ -37,6 +37,7 @@ public enum BizCodeEnum {
     ACCOUNT_UNREGISTER(250002, "账号不存在"),
     ACCOUNT_PWD_ERROR(250003, "账号或密码错误"),
     ACCOUNT_LOGIN_EXPIRED(250004, "登录信息已过期"),
+    ACCOUNT_ADDRESS_NOT_EXIST(250201, "当前地址不存在"),
 
     /**
      * 文件相关
