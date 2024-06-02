@@ -15,7 +15,7 @@ import javax.annotation.Resource;
 
 @Api("收货地址服务")
 @RestController
-@RequestMapping("api/${app.config.api.version}/addresses")
+@RequestMapping("api/${app.config.api.version}/address")
 public class AddressController {
 
     @Resource

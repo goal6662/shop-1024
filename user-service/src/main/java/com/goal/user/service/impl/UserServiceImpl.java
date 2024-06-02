@@ -119,8 +119,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             LoginUser loginUser = new LoginUser();
             BeanUtils.copyProperties(user, loginUser);
 
-//            return getTokenResult(loginUser);
-            return getRefreshResult(loginUser);
+            return getTokenResult(loginUser);
+//            return getRefreshResult(loginUser);
         }
 
         return Result.fail(BizCodeEnum.ACCOUNT_PWD_ERROR);
