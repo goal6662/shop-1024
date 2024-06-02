@@ -5,6 +5,7 @@ import com.goal.user.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
+import com.goal.user.domain.vo.UserVO;
 import com.goal.utils.Result;
 
 /**
@@ -35,4 +36,10 @@ public interface UserService extends IService<User> {
      * @return
      */
     Result<RefreshableToken> refreshToken(RefreshableToken token);
+
+    /**
+     * 查询用户详情
+     * @return
+     */
+    Result<UserVO> findUserDetail();
 }

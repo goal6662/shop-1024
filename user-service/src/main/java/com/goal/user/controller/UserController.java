@@ -5,6 +5,7 @@ import com.goal.domain.RefreshableToken;
 import com.goal.enums.BizCodeEnum;
 import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
+import com.goal.user.domain.vo.UserVO;
 import com.goal.user.service.FileService;
 import com.goal.user.service.UserService;
 import com.goal.utils.Result;
@@ -68,6 +69,13 @@ public class UserController {
             @RequestBody UserLoginDTO loginDTO
             ) {
         return userService.login(loginDTO);
+    }
+
+
+    @ApiOperation("查看个人信息详情")
+    @GetMapping("detail")
+    public Result<UserVO> detail() {
+        return userService.findUserDetail();
     }
 
     @ApiOperation("自动刷新token")

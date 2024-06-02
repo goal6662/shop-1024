@@ -10,15 +10,18 @@ import com.goal.domain.RefreshableToken;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
 import com.goal.user.common.RedisConstants;
+import com.goal.user.controller.UserController;
 import com.goal.user.domain.User;
 import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
+import com.goal.user.domain.vo.UserVO;
 import com.goal.user.service.NotifyService;
 import com.goal.user.service.UserService;
 import com.goal.user.mapper.UserMapper;
 import com.goal.utils.CommonUtil;
 import com.goal.utils.JwtUtil;
 import com.goal.utils.Result;
+import com.goal.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
@@ -74,7 +77,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         BeanUtils.copyProperties(registerDTO, user);
 
         user.setCreateTime(new Date());
-
+        user.setSlogan("这个人什么也没有留下...");
         // 账号唯一性检查
         boolean isUnique = checkUnique(registerDTO.getMail());
         if (!isUnique) {
@@ -146,6 +149,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             return result;
         }
         return Result.fail(BizCodeEnum.ACCOUNT_LOGIN_EXPIRED);
+    }
+
+    @Override
+    public Result<UserVO> findUserDetail() {
+        Long userId = UserContext.getUser().getId();
+
+        User user = userMapper.selectById(userId);
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+
+        return Result.success(userVO);
     }
 
     /**
