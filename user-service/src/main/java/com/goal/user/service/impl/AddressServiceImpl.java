@@ -19,7 +19,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Goal
@@ -85,6 +89,21 @@ public class AddressServiceImpl extends ServiceImpl<AddressMapper, Address>
 
         int rows = addressMapper.deleteUserAddressById(id, userId);
         return rows == 0 ? Result.fail(BizCodeEnum.ACCOUNT_ADDRESS_NOT_EXIST) : Result.success();
+    }
+
+    @Override
+    public Result<List<AddressVO>> findUserAllAddress() {
+        Long userId = UserContext.getUser().getId();
+
+        List<Address> addressList = addressMapper.listByUserId(userId);
+
+        List<AddressVO> addressVOList = addressList.stream().map((address -> {
+            AddressVO addressVO = new AddressVO();
+            BeanUtils.copyProperties(address, addressVO);
+            return addressVO;
+        })).collect(Collectors.toList());
+
+        return Result.success(addressVOList.isEmpty() ? null : addressVOList);
     }
 }
 

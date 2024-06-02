@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Api("收货地址服务")
 @RestController
@@ -25,6 +26,12 @@ public class AddressController {
             @ApiParam(value = "地址id", required = true)
             @PathVariable Long id) {
         return addressService.getDetailById(id);
+    }
+
+    @ApiOperation("查询用户所有地址信息")
+    @GetMapping("/list")
+    public Result<List<AddressVO>> findAllAddress() {
+        return addressService.findUserAllAddress();
     }
 
     @ApiOperation("新增收货地址")

@@ -6,6 +6,8 @@ import com.goal.user.domain.dto.AddressAddDTO;
 import com.goal.user.domain.vo.AddressVO;
 import com.goal.utils.Result;
 
+import java.util.List;
+
 /**
 * @author Goal
 * @description 针对表【address(电商-公司收发货地址表)】的数据库操作Service
@@ -33,4 +35,10 @@ public interface AddressService extends IService<Address> {
      * @return
      */
     Result deleteById(Long id);
+
+    /**
+     * 查询用户所有地址信息
+     * @return
+     */
+    Result<List<AddressVO>> findUserAllAddress();
 }

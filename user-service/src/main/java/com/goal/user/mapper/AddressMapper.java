@@ -4,6 +4,8 @@ import com.goal.user.domain.Address;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
 * @author Goal
 * @description 针对表【address(电商-公司收发货地址表)】的数据库操作Mapper
@@ -41,6 +43,8 @@ public interface AddressMapper extends BaseMapper<Address> {
      * @return 受影响的行数
      */
     int deleteUserAddressById(@Param("id") Long id, @Param("userId") Long userId);
+
+    List<Address> listByUserId(@Param("userId") Long userId);
 }
 
 
