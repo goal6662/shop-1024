@@ -25,4 +25,10 @@
         coupon_title,start_time,end_time,
         order_id,price,condition_price
     </sql>
+    <select id="getUserClaimCount" resultType="java.lang.Integer">
+        select count(*)
+        from
+            shop_coupon.coupon_record
+        where user_id = #{userId} and coupon_id = #{couponId}
+    </select>
 </mapper>

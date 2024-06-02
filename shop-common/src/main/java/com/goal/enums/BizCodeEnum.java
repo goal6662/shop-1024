@@ -42,7 +42,15 @@ public enum BizCodeEnum {
     /**
      * 文件相关
      */
-    FILE_UPLOAD_ERROR(260001, "文件上传失败");
+    FILE_UPLOAD_ERROR(260001, "文件上传失败"),
+
+
+    /**
+     * 优惠券相关
+     */
+    COUPON_UNAVAILABLE(300001, "当前优惠券不可用"),
+    COUPON_OUT_OF_LIMIT(300002, "优惠券领取次数达到上限"),
+    COUPON_NO_STOCK(300003, "优惠券库存不足");
 
     private final String message;
     private final int code;

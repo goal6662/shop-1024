@@ -1,6 +1,7 @@
 package com.goal.coupon.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.goal.coupon.domain.enums.CouponCategoryEnum;
 import com.goal.coupon.domain.po.Coupon;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.utils.Result;
@@ -21,4 +22,12 @@ public interface CouponService extends IService<Coupon> {
      * @return 查询结果
      */
     Result pageCoupon(int page, int size);
+
+    /**
+     * 领取优惠券
+     * @param couponId 优惠券id
+     * @param couponCategoryEnum 优惠券类型
+     * @return
+     */
+    Result addCoupon(long couponId, CouponCategoryEnum couponCategoryEnum);
 }
