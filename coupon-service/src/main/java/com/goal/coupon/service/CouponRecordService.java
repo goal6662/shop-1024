@@ -2,6 +2,7 @@ package com.goal.coupon.service;
 
 import com.goal.coupon.domain.po.CouponRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.goal.coupon.domain.vo.CouponRecordVO;
 import com.goal.utils.Result;
 
 /**
@@ -18,4 +19,11 @@ public interface CouponRecordService extends IService<CouponRecord> {
      * @return
      */
     Result pageUserCouponRecord(int page, int size);
+
+    /**
+     * 查询用户个人优惠券记录
+     * @param recordId 优惠券记录ID
+     * @return 用户的优惠券记录
+     */
+    CouponRecordVO findById(long recordId);
 }

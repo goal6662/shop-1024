@@ -54,6 +54,23 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
         return Result.success(pageMap);
     }
 
+    @Override
+    public CouponRecordVO findById(long recordId) {
+        Long userId = UserContext.getUser().getId();
+
+        LambdaQueryWrapper<CouponRecord> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(CouponRecord::getId, recordId)
+                .eq(CouponRecord::getUserId, userId)
+                .orderByDesc(CouponRecord::getCreateTime);
+
+        CouponRecord couponRecord = couponRecordMapper.selectOne(wrapper);
+        if (couponRecord == null) {
+            return null;
+        }
+
+        return transferToVO(couponRecord);
+    }
+
     private CouponRecordVO transferToVO(CouponRecord couponRecord) {
         CouponRecordVO couponRecordVO = new CouponRecordVO();
         BeanUtils.copyProperties(couponRecord, couponRecordVO);

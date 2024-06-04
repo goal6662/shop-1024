@@ -1,13 +1,12 @@
 package com.goal.coupon.controller;
 
+import com.goal.coupon.domain.vo.CouponRecordVO;
 import com.goal.coupon.service.CouponRecordService;
+import com.goal.enums.BizCodeEnum;
 import com.goal.utils.Result;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -27,6 +26,16 @@ public class CouponRecordController {
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         return couponRecordService.pageUserCouponRecord(page, size);
+    }
+
+    @ApiOperation("查询优惠券记录详情")
+    @GetMapping("detail/{record_id}")
+    public Result<CouponRecordVO> getCouponRecordDetail(
+            @ApiParam("优惠券记录ID") @PathVariable("record_id") long recordId
+    ) {
+        CouponRecordVO couponRecordVO = couponRecordService.findById(recordId);
+        return couponRecordVO == null ?
+                Result.fail(BizCodeEnum.COUPON_NOT_EXIST) : Result.success(couponRecordVO);
     }
 
 }
