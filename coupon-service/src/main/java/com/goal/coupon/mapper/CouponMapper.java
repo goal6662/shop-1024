@@ -4,6 +4,8 @@ import com.goal.coupon.domain.po.Coupon;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
 * @author Goal
 * @description 针对表【coupon】的数据库操作Mapper
@@ -27,6 +29,13 @@ public interface CouponMapper extends BaseMapper<Coupon> {
      * @return
      */
     int reduceStock(@Param("id") long couponId);
+
+    /**
+     * 查询指定类别的优惠券
+     * @param category 优惠券类别
+     * @return
+     */
+    List<Coupon> listCouponByCategory(String category);
 }
 
 

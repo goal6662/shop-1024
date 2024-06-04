@@ -44,4 +44,11 @@
           and publish = 'PUBLISH'
           and now() between start_time and end_time
     </select>
+    <select id="listCouponByCategory" resultType="com.goal.coupon.domain.po.Coupon">
+        select id, category, publish, coupon_img, coupon_title, price, user_limit, start_time,
+               end_time, publish_count, stock, create_time, condition_price
+        from
+            shop_coupon.coupon
+        where category = #{category}
+    </select>
 </mapper>

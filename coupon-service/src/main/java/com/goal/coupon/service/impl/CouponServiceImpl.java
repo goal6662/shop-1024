@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.coupon.common.RedisConstant;
+import com.goal.coupon.domain.dto.CouponNewUserDTO;
 import com.goal.coupon.domain.enums.CouponCategoryEnum;
 import com.goal.coupon.domain.enums.CouponRecordStatusEnum;
 import com.goal.coupon.domain.enums.CouponStatusEnum;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -137,6 +139,36 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon>
             // 解锁
             rLock.unlock();
         }
+    }
+
+    /**
+     * 新用户注册时并未登录
+     *  1. 该接口不应该被拦截
+     *  2. 调用时传入userId
+     *  3. 设置在UserContext后调用领取方法
+     *  4. 调用前需要判断用户是否为新用户
+     * @param couponNewUserDTO
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+    @Override
+    public Result initNewUserCoupon(CouponNewUserDTO couponNewUserDTO) {
+        LoginUser loginUser = new LoginUser();
+        loginUser.setId(couponNewUserDTO.getUserId());
+        loginUser.setName(couponNewUserDTO.getName());
+
+        UserContext.setUser(loginUser);
+
+        // 查询新用户有哪些优惠券可以领取：类别为新用户
+        List<Coupon> couponList = couponMapper.listCouponByCategory(CouponCategoryEnum.NEW_USER.name());
+
+        for (Coupon coupon : couponList) {
+            // 幂等操作，调用需要加锁
+            this.addCoupon(coupon.getId(), CouponCategoryEnum.NEW_USER);
+        }
+
+
+        return Result.success();
     }
 
     /**

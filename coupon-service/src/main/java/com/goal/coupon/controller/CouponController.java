@@ -1,5 +1,6 @@
 package com.goal.coupon.controller;
 
+import com.goal.coupon.domain.dto.CouponNewUserDTO;
 import com.goal.coupon.domain.enums.CouponCategoryEnum;
 import com.goal.coupon.service.CouponService;
 import com.goal.utils.Result;
@@ -34,6 +35,13 @@ public class CouponController {
             @PathVariable("coupon_id") long couponId
     ) {
         return couponService.addCoupon(couponId, CouponCategoryEnum.PROMOTION);
+    }
+
+    @ApiOperation("RPC-新用户注册福利")
+    @PostMapping("/new_user_coupon")
+    public Result addNewUserCoupon(
+            @ApiParam("用户对象") @RequestBody CouponNewUserDTO couponNewUserDTO) {
+        return couponService.initNewUserCoupon(couponNewUserDTO);
     }
 
 }
