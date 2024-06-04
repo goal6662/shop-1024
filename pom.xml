@@ -39,6 +39,7 @@
         <springfox.boot.starter.version>3.0.0</springfox.boot.starter.version>
         <hutool.version>5.7.5</hutool.version>
         <aliyun.oss.version>3.10.2</aliyun.oss.version>
+        <redisson.version>3.19.1</redisson.version>
 
         <docker.image.prefix>shop-cloud</docker.image.prefix>
         <!--跳过单元测试-->
@@ -49,6 +50,13 @@
     <!--锁定版本：仅是管理，使用时仍需引入-->
     <dependencyManagement>
         <dependencies>
+
+            <!-- Redisson分布式锁 -->
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
 
             <!-- jwt -->
             <dependency>

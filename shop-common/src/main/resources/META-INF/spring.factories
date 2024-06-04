@@ -1,4 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.goal.config.SwaggerConfig,\
   com.goal.exception.GlobalExceptionHandler,\
-  com.goal.config.MybatisPlusPagePlusConfig
+  com.goal.config.MybatisPlusPagePlusConfig,\
+  com.goal.config.RedissonConfig
