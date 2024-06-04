@@ -45,6 +45,11 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
         return Result.success(pageMap);
     }
 
+    @Override
+    public ProductVO findDetailById(long productId) {
+        return transferToVO(productMapper.selectById(productId));
+    }
+
     private ProductVO transferToVO(Product product) {
         ProductVO productVO = new ProductVO();
         BeanUtils.copyProperties(product, productVO);

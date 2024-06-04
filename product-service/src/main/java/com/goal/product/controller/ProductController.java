@@ -1,13 +1,11 @@
 package com.goal.product.controller;
 
+import com.goal.product.domain.vo.ProductVO;
 import com.goal.product.service.ProductService;
 import com.goal.utils.Result;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -18,6 +16,16 @@ public class ProductController {
     @Resource
     private ProductService productService;
 
+
+    @ApiOperation("查询商品详情")
+    @GetMapping("find/{product_id}")
+    public Result<ProductVO> findDetail(
+            @ApiParam(value = "商品id", required = true)
+            @PathVariable("product_id") long productId
+    ) {
+        ProductVO productVO = productService.findDetailById(productId);
+        return Result.success(productVO);
+    }
 
     @ApiOperation("分页查询商品")
     @GetMapping("page_product")

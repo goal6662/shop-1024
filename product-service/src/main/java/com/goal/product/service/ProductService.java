@@ -15,4 +15,11 @@ import java.util.List;
 public interface ProductService extends IService<Product> {
 
     Result pageProduct(int page, int size);
+
+    /**
+     * 查询商品详情
+     * @param productId
+     * @return
+     */
+    ProductVO findDetailById(long productId);
 }
