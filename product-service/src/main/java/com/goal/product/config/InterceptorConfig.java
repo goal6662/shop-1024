@@ -19,7 +19,7 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor())
-                .addPathPatterns("/api/*/product/**")
+                .addPathPatterns("/api/*/product/**", "/api/*/cart/**")
                 .excludePathPatterns(
                         "/api/*/product/page_product",
                         "/api/*/product/find/*"

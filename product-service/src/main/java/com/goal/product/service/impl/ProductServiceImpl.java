@@ -47,7 +47,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
 
     @Override
     public ProductVO findDetailById(long productId) {
-        return transferToVO(productMapper.selectById(productId));
+        Product product = productMapper.selectById(productId);
+        return product == null ? null : transferToVO(product);
     }
 
     private ProductVO transferToVO(Product product) {

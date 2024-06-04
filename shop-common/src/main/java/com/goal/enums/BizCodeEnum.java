@@ -44,6 +44,11 @@ public enum BizCodeEnum {
      */
     FILE_UPLOAD_ERROR(260001, "文件上传失败"),
 
+    /**
+     * 商品
+     */
+    PRODUCT_UNAVAILABLE(270001, "当前商品不可以使用"),
+
 
     /**
      * 优惠券相关
