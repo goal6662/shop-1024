@@ -2,6 +2,10 @@ package com.goal.product.service;
 
 import com.goal.product.domain.po.Product;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.goal.product.domain.vo.ProductVO;
+import com.goal.utils.Result;
+
+import java.util.List;
 
 /**
 * @author Goal
@@ -10,4 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface ProductService extends IService<Product> {
 
+    Result pageProduct(int page, int size);
 }
