@@ -71,6 +71,11 @@ public class CartServiceImpl extends AbstractCartService implements CartService 
         cart.put(productId, JSONUtil.toJsonStr(cartItemVO));
     }
 
+    @Override
+    public void clearUserCart() {
+        redisTemplate.delete(getCartKey());
+    }
+
     private BoundHashOperations<String, Object, Object> getCartOps() {
         String cartKey = getCartKey();
         return redisTemplate.boundHashOps(cartKey);

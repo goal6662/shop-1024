@@ -8,4 +8,9 @@ public interface CartService {
      * @param cartItemDTO
      */
     void addToCart(CartItemDTO cartItemDTO);
+
+    /**
+     * 清空用户购物车
+     */
+    void clearUserCart();
 }

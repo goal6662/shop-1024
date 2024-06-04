@@ -6,10 +6,7 @@ import com.goal.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -29,6 +26,13 @@ public class CartController {
             ) {
         cartService.addToCart(cartItemDTO);
 
+        return Result.success();
+    }
+
+    @ApiOperation("清空购物车")
+    @DeleteMapping("clear")
+    public Result clearCart() {
+        cartService.clearUserCart();
         return Result.success();
     }
 
