@@ -25,6 +25,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -86,6 +89,10 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon>
      * @param couponCategoryEnum 优惠券类型
      * @return
      */
+    @Transactional(rollbackFor = Exception.class,   // 异常回滚
+            propagation = Propagation.REQUIRED,     // 传播行为
+            isolation = Isolation.REPEATABLE_READ   // 隔离级别
+    )
     @Override
     public Result addCoupon(long couponId, CouponCategoryEnum couponCategoryEnum) {
 
