@@ -10,28 +10,25 @@ import com.goal.coupon.domain.enums.CouponStatusEnum;
 import com.goal.coupon.domain.po.Coupon;
 import com.goal.coupon.domain.po.CouponRecord;
 import com.goal.coupon.domain.vo.CouponVO;
+import com.goal.coupon.mapper.CouponMapper;
 import com.goal.coupon.mapper.CouponRecordMapper;
 import com.goal.coupon.service.CouponService;
-import com.goal.coupon.mapper.CouponMapper;
 import com.goal.domain.LoginUser;
 import com.goal.enums.BizCodeEnum;
 import com.goal.exception.BizException;
-import com.goal.utils.CommonUtil;
 import com.goal.utils.Result;
 import com.goal.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +49,9 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon>
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Resource
+    private RedissonClient redissonClient;
 
     @Override
     public Result pageCoupon(int page, int size) {
@@ -89,26 +89,11 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon>
     @Override
     public Result addCoupon(long couponId, CouponCategoryEnum couponCategoryEnum) {
 
-        String uuid = CommonUtil.generateUUID();
         String lockKey = RedisConstant.COUPON_LOCK_KEY + couponId;      // 对优惠券加锁，减少锁的粒度
-        Boolean lockFlag = redisTemplate.opsForValue().setIfAbsent(lockKey, uuid,
-                RedisConstant.COUPON_LOCK_TTL, TimeUnit.SECONDS);
 
-        // 加锁失败，一直循环尝试
-        // 自动拆装箱可能导致空指针
-        while (Boolean.FALSE.equals(lockFlag)) {
-            try {
-                // 可选，休眠
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored) {
-            }
-
-            lockFlag = redisTemplate.opsForValue().setIfAbsent(lockKey, uuid,
-                    RedisConstant.COUPON_LOCK_TTL, TimeUnit.SECONDS);
-        }
-
-
-        log.info("加锁成功：{}", couponId);
+        RLock rLock = redissonClient.getLock(lockKey);
+        rLock.lock();
+        log.info("领券接口加锁成功：{}", Thread.currentThread().getId());
         try {
             // 1. 判断优惠券是否存在且可用，已判断: 处于发布状态、优惠券类型，处于有效期内，库存大于0
             Coupon coupon = couponMapper.getAvailableCouponById(couponId, couponCategoryEnum.name());
@@ -143,14 +128,7 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon>
             return Result.success();
         } finally {
             // 解锁
-            String script = "if redis.call('get', KEYS[1]) == ARGV[1] then\n" +
-                    "    return redis.call('del', KEYS[1])\n" +
-                    "else\n" +
-                    "    return 0\n" +
-                    "end";
-            Long result = redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),
-                    List.of(lockKey), uuid);
-            log.info("释放锁：{}", result);
+            rLock.unlock();
         }
     }
 
