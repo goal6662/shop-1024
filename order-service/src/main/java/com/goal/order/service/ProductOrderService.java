@@ -1,7 +1,9 @@
 package com.goal.order.service;
 
+import com.goal.order.domain.dto.OrderConfirmDTO;
 import com.goal.order.domain.po.ProductOrder;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.goal.utils.Result;
 
 /**
 * @author Goal
@@ -10,4 +12,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface ProductOrderService extends IService<ProductOrder> {
 
+    /**
+     * 创建订单
+     * @param orderConfirmDTO
+     * @return
+     */
+    Result submitOrder(OrderConfirmDTO orderConfirmDTO);
 }
