@@ -44,3 +44,7 @@ aliyun:
     access-key-id: ${aliyun.oss.access-key-id}
     access-key-secret: ${aliyun.oss.access-key-secret}
     bucket-name: ${aliyun.oss.bucket-name}
+feign:
+  okhttp:
+    enabled: true  # 开启连接池支持
+

@@ -36,3 +36,8 @@ app:
   config:
     api:
       version: v1
+
+
+feign:
+  okhttp:
+    enabled: true  # 开启连接池支持

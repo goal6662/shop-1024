@@ -2,8 +2,10 @@ package com.goal.utils;
 
 import com.goal.enums.BizCodeEnum;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class Result<T> {
 
     private int code;
