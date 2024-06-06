@@ -8,10 +8,12 @@ import com.goal.product.domain.vo.ProductVO;
 import com.goal.product.service.ProductService;
 import com.goal.product.mapper.ProductMapper;
 import com.goal.utils.Result;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -49,6 +51,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
     public ProductVO findDetailById(long productId) {
         Product product = productMapper.selectById(productId);
         return product == null ? null : transferToVO(product);
+    }
+
+    @Override
+    public List<ProductVO> findProductByIdBatch(List<Long> productIdList) {
+        if (productIdList.isEmpty()) {
+            return null;
+        }
+
+        List<Product> products = productMapper.listByIdBatch(productIdList);
+        return products.stream().map(this::transferToVO).collect(Collectors.toList());
     }
 
     private ProductVO transferToVO(Product product) {

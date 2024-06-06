@@ -1,7 +1,6 @@
 package com.goal.product.service.impl;
 
 import cn.hutool.json.JSONUtil;
-import com.goal.constant.CacheKey;
 import com.goal.enums.BizCodeEnum;
 import com.goal.exception.BizException;
 import com.goal.product.domain.dto.CartItemDTO;
@@ -9,13 +8,17 @@ import com.goal.product.domain.vo.CartItemVO;
 import com.goal.product.domain.vo.ProductVO;
 import com.goal.product.service.CartService;
 import com.goal.product.service.ProductService;
-import com.goal.utils.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImpl extends AbstractCartService implements CartService {
@@ -76,9 +79,56 @@ public class CartServiceImpl extends AbstractCartService implements CartService 
         redisTemplate.delete(getCartKey());
     }
 
+
     private BoundHashOperations<String, Object, Object> getCartOps() {
         String cartKey = getCartKey();
         return redisTemplate.boundHashOps(cartKey);
     }
 
+    @Override
+    protected List<CartItemVO> buildCartItem(boolean latestPrice) {
+
+        BoundHashOperations<String, Object, Object> myCart = getCartOps();
+
+        List<Object> itemList = myCart.values();
+
+        List<Long> productList = new ArrayList<>();
+        List<CartItemVO> cartItemVOList = new ArrayList<>();
+        if (itemList != null) {
+            cartItemVOList = itemList.stream().map((item) -> {
+                        CartItemVO cartItemVO = JSONUtil.toBean((String) item, CartItemVO.class);
+                        // 保存ID
+                        productList.add(cartItemVO.getProductId());
+                        return cartItemVO;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        // 要查询最新价格
+        if (latestPrice) {
+            setProductLatestPrice(cartItemVOList, productList);
+        }
+
+        return cartItemVOList;
+    }
+
+    /**
+     * 查询并设置最新的商品价格
+     * @param cartItemVOList
+     * @param productIdList
+     */
+    private void setProductLatestPrice(List<CartItemVO> cartItemVOList, List<Long> productIdList) {
+
+        // 建立ID和Product实体的映射
+        List<ProductVO> productVOList = productService.findProductByIdBatch(productIdList);
+        Map<Long, ProductVO> productVOMap = productVOList.stream()
+                .collect(Collectors.toMap(ProductVO::getId, Function.identity()));
+
+        // 设置最新价格
+        cartItemVOList.forEach((item) -> {
+            ProductVO productVO = productVOMap.get(item.getProductId());
+            item.setPrice(productVO.getPrice());
+        });
+
+    }
 }

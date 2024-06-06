@@ -22,4 +22,11 @@ public interface ProductService extends IService<Product> {
      * @return
      */
     ProductVO findDetailById(long productId);
+
+    /**
+     * 根据ID批量查询商品
+     * @param productIdList 商品ID
+     * @return
+     */
+    List<ProductVO> findProductByIdBatch(List<Long> productIdList);
 }

@@ -46,7 +46,7 @@ public class CartVO {
 
         BigDecimal total = BigDecimal.ZERO;
         for (CartItemVO cartItem : cartItems) {
-            total = total.add(cartItem.getTotalAmount());
+            total = total.add(cartItem.getTotalPrice());
         }
         return total;
     }

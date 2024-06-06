@@ -13,11 +13,6 @@ public class CartItemVO {
     /**
      * 商品id
      */
-    private Long id;
-
-    /**
-     * 商品id
-     */
     private Long productId;
 
     /**
@@ -49,7 +44,7 @@ public class CartItemVO {
      * 获取总价
      * @return 数量 * 单价
      */
-    public BigDecimal getTotalAmount() {
+    public BigDecimal getTotalPrice() {
         return this.price.multiply(new BigDecimal(this.buyNum));
     }
 

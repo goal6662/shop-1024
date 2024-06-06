@@ -2,6 +2,10 @@ package com.goal.product.mapper;
 
 import com.goal.product.domain.po.Product;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.goal.product.domain.vo.ProductVO;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author Goal
@@ -11,6 +15,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface ProductMapper extends BaseMapper<Product> {
 
+    List<Product> listByIdBatch(@Param("idList") List<Long> productIdList);
 }
 
 

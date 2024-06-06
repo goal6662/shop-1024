@@ -21,4 +21,19 @@
         detail,old_price,price,
         stock,create_time,lock_stock
     </sql>
+
+    <!--
+        1. item 代表集合的元素
+        2. collection 代表集合，和@Param匹配
+        3. index 可选的索引变量
+     -->
+    <select id="listByIdBatch" resultType="com.goal.product.domain.po.Product">
+        select <include refid="Base_Column_List"/> 
+            from
+                shop_product.product
+        where id in
+            <foreach item="id" index="index" collection="idList" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+    </select>
 </mapper>

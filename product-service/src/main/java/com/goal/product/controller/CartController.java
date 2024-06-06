@@ -1,6 +1,7 @@
 package com.goal.product.controller;
 
 import com.goal.product.domain.dto.CartItemDTO;
+import com.goal.product.domain.vo.CartVO;
 import com.goal.product.service.CartService;
 import com.goal.utils.Result;
 import io.swagger.annotations.Api;
@@ -34,6 +35,14 @@ public class CartController {
     public Result clearCart() {
         cartService.clearUserCart();
         return Result.success();
+    }
+
+    @ApiOperation("查看我的购物车")
+    @GetMapping("/my_cart")
+    public Result findMyCart() {
+        CartVO cartVO = cartService.getMyCart();
+
+        return Result.success(cartVO);
     }
 
 }
