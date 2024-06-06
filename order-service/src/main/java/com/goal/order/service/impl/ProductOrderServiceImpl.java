@@ -17,6 +17,21 @@ import org.springframework.stereotype.Service;
 public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, ProductOrder>
     implements ProductOrderService{
 
+    /**
+     * 防止重复提交
+     * 用户微服务-确认收获地址
+     * 商品微服务-获取购物车购物项的最新价格
+     * 订单验价
+     *  优惠券微服务-获取优惠券
+     *  验证价格
+     * 锁定优惠券
+     * 锁定商品库存
+     * 创建订单对象
+     * 发送延迟消息-用于自动关单 [请在 15min 支付订单，超时订单将自动取消]
+     * 创建支付消息-对接第三方支付
+     * @param orderConfirmDTO
+     * @return
+     */
     @Override
     public Result submitOrder(OrderConfirmDTO orderConfirmDTO) {
         // TODO: 2024/6/6 创建订单

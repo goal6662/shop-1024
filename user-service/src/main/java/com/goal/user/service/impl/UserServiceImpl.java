@@ -9,9 +9,11 @@ import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
 import com.goal.user.common.RedisConstants;
 import com.goal.user.domain.User;
+import com.goal.user.domain.dto.CouponNewUserDTO;
 import com.goal.user.domain.dto.UserLoginDTO;
 import com.goal.user.domain.dto.UserRegisterDTO;
 import com.goal.user.domain.vo.UserVO;
+import com.goal.user.feign.CouponFeignService;
 import com.goal.user.mapper.UserMapper;
 import com.goal.user.service.NotifyService;
 import com.goal.user.service.UserService;
@@ -50,6 +52,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Resource
     private UserMapper userMapper;
+
+    @Resource
+    private CouponFeignService couponFeignService;
 
     /**
      * 邮箱验证码验证
@@ -163,6 +168,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @param user 新用户
      */
     private void userRegisterInitTask(User user) {
+        CouponNewUserDTO couponNewUserDTO = new CouponNewUserDTO();
+        couponNewUserDTO.setUserId(user.getId());
+        couponNewUserDTO.setName(user.getName());
+
+        Result result = couponFeignService.addNewUserCoupon(couponNewUserDTO);
+        log.info("发放新用户优惠券：{}，结果：{}", couponNewUserDTO, result);
     }
 
     /**
