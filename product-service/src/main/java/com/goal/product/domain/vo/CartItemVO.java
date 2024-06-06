@@ -40,6 +40,11 @@ public class CartItemVO {
      */
     private BigDecimal totalPrice;
 
+
+    public void setBuyNum(Integer buyNum) {
+        this.buyNum = buyNum > 0 ? buyNum : 1;
+    }
+
     /**
      * 获取总价
      * @return 数量 * 单价

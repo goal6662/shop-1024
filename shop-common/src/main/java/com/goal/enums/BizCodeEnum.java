@@ -48,6 +48,7 @@ public enum BizCodeEnum {
      * 商品
      */
     PRODUCT_UNAVAILABLE(270001, "当前商品不可以使用"),
+    PRODUCT_MODIFY_ERROR(270002, "修改商品信息失败"),
 
 
     /**

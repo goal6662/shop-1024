@@ -45,4 +45,22 @@ public class CartController {
         return Result.success(cartVO);
     }
 
+    @ApiOperation("删除购物项")
+    @DeleteMapping("delete/{product_id}")
+    public Result deleteItem(
+            @ApiParam("商品ID") @PathVariable("product_id") Long productId
+    ) {
+        cartService.deleteItemById(productId);
+        return Result.success();
+    }
+
+
+    @ApiOperation("修改购物项")
+    @PutMapping("change")
+    public Result changeItem(
+            @ApiParam("购物项") @RequestBody CartItemDTO cartItemDTO
+    ) {
+        cartService.changeItemNum(cartItemDTO);
+        return Result.success();
+    }
 }

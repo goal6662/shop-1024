@@ -1,6 +1,7 @@
 package com.goal.product.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import com.goal.constant.CacheKey;
 import com.goal.enums.BizCodeEnum;
 import com.goal.exception.BizException;
 import com.goal.product.domain.dto.CartItemDTO;
@@ -8,6 +9,7 @@ import com.goal.product.domain.vo.CartItemVO;
 import com.goal.product.domain.vo.ProductVO;
 import com.goal.product.service.CartService;
 import com.goal.product.service.ProductService;
+import com.goal.utils.UserContext;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -79,10 +81,16 @@ public class CartServiceImpl extends AbstractCartService implements CartService 
         redisTemplate.delete(getCartKey());
     }
 
-
-    private BoundHashOperations<String, Object, Object> getCartOps() {
+    @Override
+    protected BoundHashOperations<String, Object, Object> getCartOps() {
         String cartKey = getCartKey();
         return redisTemplate.boundHashOps(cartKey);
+    }
+
+    @Override
+    protected String getCartKey()  {
+        Long userId = UserContext.getUser().getId();
+        return CacheKey.getCartKey(userId);
     }
 
     @Override
