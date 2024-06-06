@@ -5,6 +5,9 @@ spring:
     active: dev
   application:
     name: order-service   # 微服务名称
+  cloud:
+    nacos:
+      server-addr: 192.168.121.153:8848
   # 数据库
   datasource:
     url: jdbc:mysql://${shop.db.uri}/shop_order?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
