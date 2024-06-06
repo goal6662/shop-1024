@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goal.order.mapper.ProductOrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.goal.order.domain.po.ProductOrder">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="outTradeNo" column="out_trade_no" jdbcType="VARCHAR"/>
+            <result property="state" column="state" jdbcType="VARCHAR"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="totalPrice" column="total_price" jdbcType="DECIMAL"/>
+            <result property="payPrice" column="pay_price" jdbcType="DECIMAL"/>
+            <result property="payType" column="pay_type" jdbcType="VARCHAR"/>
+            <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+            <result property="headImg" column="head_img" jdbcType="VARCHAR"/>
+            <result property="userId" column="user_id" jdbcType="INTEGER"/>
+            <result property="del" column="del" jdbcType="INTEGER"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="orderType" column="order_type" jdbcType="VARCHAR"/>
+            <result property="receiverAddress" column="receiver_address" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,out_trade_no,state,
+        create_time,total_price,pay_price,
+        pay_type,nickname,head_img,
+        user_id,del,update_time,
+        order_type,receiver_address
+    </sql>
+</mapper>

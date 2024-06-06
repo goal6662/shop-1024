@@ -1,0 +1,14 @@
+shop:
+  db:
+    uri: ip:port
+    pwd: password
+  redis:
+    host: ip
+    port: port
+    pwd: password
+aliyun:
+  oss:
+    endpoint: 1
+    access-key-id: 2
+    access-key-secret: 3
+    bucket-name: 4

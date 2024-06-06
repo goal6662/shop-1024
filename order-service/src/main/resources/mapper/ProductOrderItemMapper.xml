@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goal.order.mapper.ProductOrderItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.goal.order.domain.po.ProductOrderItem">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="productOrderId" column="product_order_id" jdbcType="BIGINT"/>
+            <result property="outTradeNo" column="out_trade_no" jdbcType="VARCHAR"/>
+            <result property="productId" column="product_id" jdbcType="BIGINT"/>
+            <result property="productName" column="product_name" jdbcType="VARCHAR"/>
+            <result property="productImg" column="product_img" jdbcType="VARCHAR"/>
+            <result property="buyNum" column="buy_num" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="totalPrice" column="total_price" jdbcType="DECIMAL"/>
+            <result property="price" column="price" jdbcType="DECIMAL"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,product_order_id,out_trade_no,
+        product_id,product_name,product_img,
+        buy_num,create_time,total_price,
+        price
+    </sql>
+</mapper>
