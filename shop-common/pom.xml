@@ -19,10 +19,11 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
-        </dependency>
+        <!-- Seata：对性能影响很大，尽量避免使用 -->
+        <!-- <dependency> -->
+        <!--     <groupId>com.alibaba.cloud</groupId> -->
+        <!--     <artifactId>spring-cloud-starter-alibaba-seata</artifactId> -->
+        <!-- </dependency> -->
 
         <dependency>
             <groupId>com.alibaba.cloud</groupId>

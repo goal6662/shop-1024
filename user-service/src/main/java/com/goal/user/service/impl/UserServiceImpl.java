@@ -21,7 +21,6 @@ import com.goal.utils.CommonUtil;
 import com.goal.utils.JwtUtil;
 import com.goal.utils.Result;
 import com.goal.utils.UserContext;
-import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
@@ -68,8 +67,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @return
      */
     @Override
-//    @Transactional(rollbackFor = Exception.class)
-    @GlobalTransactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
+//    @GlobalTransactional(rollbackFor = Exception.class)
     public Result register(UserRegisterDTO registerDTO) {
 
         String email = registerDTO.getMail();
