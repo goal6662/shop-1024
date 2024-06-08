@@ -47,3 +47,16 @@ aliyun:
 feign:
   okhttp:
     enabled: true  # 开启连接池支持
+  client:
+    config:
+      default:
+        connectTimeout: 5000 # 连接超时时间，单位毫秒
+        readTimeout: 5000    # 读取超时时间，单位毫秒
+
+seata:
+  tx-service-group: ${spring.application.name}-group
+  service:
+    grouplist:
+      shop: 192.168.121.153:8099
+    vgroup-mapping:
+      user-service-group: shop

@@ -21,6 +21,7 @@ import com.goal.utils.CommonUtil;
 import com.goal.utils.JwtUtil;
 import com.goal.utils.Result;
 import com.goal.utils.UserContext;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.Md5Crypt;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -66,6 +68,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @return
      */
     @Override
+//    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional(rollbackFor = Exception.class)
     public Result register(UserRegisterDTO registerDTO) {
 
         String email = registerDTO.getMail();
@@ -173,6 +177,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         couponNewUserDTO.setName(user.getName());
 
         Result result = couponFeignService.addNewUserCoupon(couponNewUserDTO);
+
+        // 调用失败时，主动抛出异常用于回滚
+        if (result.getCode() != BizCodeEnum.OPS_SUCCESS.getCode()) {
+            throw new RuntimeException();
+        }
         log.info("发放新用户优惠券：{}，结果：{}", couponNewUserDTO, result);
     }
 

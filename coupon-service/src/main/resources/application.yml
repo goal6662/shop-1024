@@ -41,3 +41,11 @@ app:
 feign:
   okhttp:
     enabled: true  # 开启连接池支持
+
+seata:
+  tx-service-group: ${spring.application.name}-group
+  service:
+    grouplist:
+      shop: 192.168.121.153:8099
+    vgroup-mapping:
+      coupon-service-group: shop
