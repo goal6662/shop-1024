@@ -57,7 +57,12 @@ public enum BizCodeEnum {
     COUPON_UNAVAILABLE(300001, "当前优惠券不可用"),
     COUPON_OUT_OF_LIMIT(300002, "优惠券领取次数达到上限"),
     COUPON_NO_STOCK(300003, "优惠券库存不足"),
-    COUPON_NOT_EXIST(300004, "查询优惠券不存在");
+    COUPON_NOT_EXIST(300004, "查询优惠券不存在"),
+
+    /**
+     * 优惠券记录相关
+     */
+    COUPON_RECORD_LOCK_FAIL(310005, "优惠券记录锁定失败");
 
     private final String message;
     private final int code;

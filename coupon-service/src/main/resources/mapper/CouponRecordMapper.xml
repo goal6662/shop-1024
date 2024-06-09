@@ -25,6 +25,21 @@
         coupon_title,start_time,end_time,
         order_id,price,condition_price
     </sql>
+
+    <!-- 批量更新优惠券记录 -->
+    <update id="changeRecordStateBatch">
+        update
+            shop_coupon.coupon_record
+        set
+            use_state = #{toStatus}
+        where
+            user_id = #{userId} and use_state = #{fromStatus}
+        and
+            id in
+                <foreach item="id" collection="ids" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+    </update>
     <select id="getUserClaimCount" resultType="java.lang.Integer">
         select count(*)
         from

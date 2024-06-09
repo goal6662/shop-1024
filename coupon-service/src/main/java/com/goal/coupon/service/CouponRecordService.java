@@ -1,5 +1,6 @@
 package com.goal.coupon.service;
 
+import com.goal.coupon.domain.dto.CouponLockDTO;
 import com.goal.coupon.domain.po.CouponRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.coupon.domain.vo.CouponRecordVO;
@@ -26,4 +27,10 @@ public interface CouponRecordService extends IService<CouponRecord> {
      * @return 用户的优惠券记录
      */
     CouponRecordVO findById(long recordId);
+
+    /**
+     * 锁定优惠券信息
+     * @param couponLockDTO
+     */
+    Result lockCouponRecords(CouponLockDTO couponLockDTO);
 }

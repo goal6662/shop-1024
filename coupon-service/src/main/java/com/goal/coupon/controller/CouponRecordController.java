@@ -1,5 +1,6 @@
 package com.goal.coupon.controller;
 
+import com.goal.coupon.domain.dto.CouponLockDTO;
 import com.goal.coupon.domain.vo.CouponRecordVO;
 import com.goal.coupon.service.CouponRecordService;
 import com.goal.enums.BizCodeEnum;
@@ -36,6 +37,14 @@ public class CouponRecordController {
         CouponRecordVO couponRecordVO = couponRecordService.findById(recordId);
         return couponRecordVO == null ?
                 Result.fail(BizCodeEnum.COUPON_NOT_EXIST) : Result.success(couponRecordVO);
+    }
+
+    @ApiOperation("RPC-锁定优惠券记录")
+    @PostMapping("lock_record")
+    public Result lockCouponRecords(
+            @ApiParam("锁定优惠券信息") @RequestBody CouponLockDTO couponLockDTO
+            ) {
+        return couponRecordService.lockCouponRecords(couponLockDTO);
     }
 
 }

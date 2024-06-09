@@ -16,4 +16,26 @@
         id,coupon_record_id,create_time,
         out_trade_no,lock_state
     </sql>
+
+    <sql id="Base_column_List_No_id">
+        coupon_record_id,create_time,out_trade_no,lock_state
+    </sql>
+    <!-- 批量插入优惠券任务记录
+        useGeneratedKeys: 自动生成主键ID
+        keyProperty: 主键字段
+     -->
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into
+            shop_coupon.coupon_task (<include refid="Base_column_List_No_id"/>)
+        values
+            <foreach collection="couponTaskList" item="task" separator=",">
+                (
+                    #{task.couponRecordId},
+                    #{task.createTime},
+                    #{task.outTradeNo},
+                    #{task.lockState}
+                )
+            </foreach>
+
+    </insert>
 </mapper>

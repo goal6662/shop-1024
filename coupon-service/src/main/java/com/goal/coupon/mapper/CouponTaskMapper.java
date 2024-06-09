@@ -2,6 +2,9 @@ package com.goal.coupon.mapper;
 
 import com.goal.coupon.domain.po.CouponTask;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author Goal
@@ -11,6 +14,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface CouponTaskMapper extends BaseMapper<CouponTask> {
 
+    /**
+     * 批量插入
+     * @param couponTaskList
+     * @return
+     */
+    int insertBatch(@Param("couponTaskList") List<CouponTask> couponTaskList);
 }
 
 
