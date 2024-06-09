@@ -156,7 +156,7 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
      */
     @Override
     public boolean releaseCouponRecord(CouponRecordMessage couponRecordMessage) {
-        // TODO: 2024/6/9 释放优惠券记录
+        // 释放优惠券记录
         // 1. 查找任务task释放存在
         CouponTask couponTask = couponTaskMapper.selectById(couponRecordMessage.getTaskId());
         if (couponTask == null) {
@@ -176,6 +176,7 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
                     // 订单已支付，设置任务状态为完成
                     couponTask.setLockState(CouponTaskStatusEnum.FINISH.name());
                     couponTaskMapper.updateById(couponTask);
+                    return true;
                 } else if (state.equalsIgnoreCase(ProductOrderStateEnum.NEW.name())) {
                     // 订单是新建状态
                     log.warn("订单状态为NEW，返回给消息队列重新投递");
@@ -183,16 +184,15 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
                 }
             }
 
-            log.warn("订单不存在，释放记录：{}", couponTask.getOutTradeNo());
+            log.warn("订单不存在或被取消，释放记录：{}", couponTask.getOutTradeNo());
             couponTask.setLockState(CouponTaskStatusEnum.CANCEL.name());
             couponTaskMapper.updateById(couponTask);
 
             couponRecordMapper.changeRecordStateById(couponTask.getCouponRecordId(), CouponRecordStatusEnum.NEW.name());
-            return true;
         } else {
             log.warn("task状态非LOCK，state：{}，消息体：{}", couponTask.getLockState(), couponRecordMessage);
-            return true;
         }
+        return true;
     }
 
     private CouponRecordVO transferToVO(CouponRecord couponRecord) {

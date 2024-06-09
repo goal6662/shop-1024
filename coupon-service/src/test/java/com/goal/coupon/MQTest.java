@@ -1,6 +1,7 @@
 package com.goal.coupon;
 
 import com.goal.coupon.config.RabbitMQConfig;
+import com.goal.domain.CouponRecordMessage;
 import com.goal.enums.BizCodeEnum;
 import com.goal.utils.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,18 @@ public class MQTest {
 
         rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(), rabbitMQConfig.getReleaseDelayRoutingKey(),
                 Result.fail(BizCodeEnum.COUPON_NO_STOCK));
+
+    }
+
+    @Test
+    public void testCouponRecordRelease() {
+
+        CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
+        couponRecordMessage.setOutTradeNo("123456");
+        couponRecordMessage.setTaskId(18L);
+
+        rabbitTemplate.convertAndSend(rabbitMQConfig.getEventExchange(),
+                rabbitMQConfig.getReleaseDelayRoutingKey(), couponRecordMessage);
 
     }
 
