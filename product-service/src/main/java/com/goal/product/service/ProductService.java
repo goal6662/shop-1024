@@ -1,8 +1,9 @@
 package com.goal.product.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.goal.domain.ProductMessage;
 import com.goal.product.domain.dto.ProductLockDTO;
 import com.goal.product.domain.po.Product;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.product.domain.vo.ProductVO;
 import com.goal.utils.Result;
 
@@ -37,4 +38,11 @@ public interface ProductService extends IService<Product> {
      * @return
      */
     Result lockProducts(ProductLockDTO productLockDTO);
+
+    /**
+     * 判断并释放商品库存
+     * @param productMessage 信息
+     * @return
+     */
+    boolean releaseProductStock(ProductMessage productMessage);
 }

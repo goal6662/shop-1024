@@ -24,6 +24,13 @@ public interface ProductMapper extends BaseMapper<Product> {
      * @return 影响行数
      */
     int lockProductStock(@Param("productId") long productId, @Param("buyNum") int buyNum);
+
+    /**
+     * 恢复商品库存
+     * @param productId 商品ID
+     * @param buyNum 购买数目（库存减上该值）
+     */
+    void changLockStockById(@Param("productId") Long productId, @Param("buyNum") Integer buyNum);
 }
 
 

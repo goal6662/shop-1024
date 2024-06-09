@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.domain.ProductMessage;
 import com.goal.enums.BizCodeEnum;
+import com.goal.enums.order.ProductOrderStateEnum;
 import com.goal.exception.BizException;
 import com.goal.product.domain.ProductTaskStatusEnum;
 import com.goal.product.domain.dto.CartItemDTO;
@@ -12,6 +13,7 @@ import com.goal.product.domain.dto.ProductLockDTO;
 import com.goal.product.domain.po.Product;
 import com.goal.product.domain.po.ProductTask;
 import com.goal.product.domain.vo.ProductVO;
+import com.goal.product.feigin.OrderFeignService;
 import com.goal.product.mapper.ProductTaskMapper;
 import com.goal.product.mq.RabbitMQService;
 import com.goal.product.service.ProductService;
@@ -48,6 +50,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
 
     @Resource
     private RabbitMQService rabbitMQService;
+
+    @Resource
+    private OrderFeignService orderFeignService;
 
     @Override
     public Result pageProduct(int page, int size) {
@@ -137,6 +142,47 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
             }
         }
         return Result.success();
+    }
+
+    @Override
+    public boolean releaseProductStock(ProductMessage productMessage) {
+        // 1. 查找任务单是否存在
+        ProductTask productTask = productTaskMapper.selectById(productMessage.getTaskId());
+        if (productTask == null) {
+            log.warn("锁定库存-任务单不存在：{}", productMessage);
+            return true;
+        }
+
+        if (productTask.getLockState().equalsIgnoreCase(ProductTaskStatusEnum.LOCK.name())) {
+            Result<String> result = orderFeignService.queryProductOrderState(productMessage.getOutTradeNo());
+
+            if (result.getCode() == BizCodeEnum.OPS_SUCCESS.getCode()) {
+                // 响应成功代表找到了订单
+                if (result.getData().equalsIgnoreCase(ProductOrderStateEnum.PAY.name())) {
+                    // 订单已支付，设置任务为完成
+                    productTask.setLockState(ProductTaskStatusEnum.FINISH.name());
+                    productTaskMapper.updateById(productTask);
+                    return true;
+                }
+
+                if (result.getData().equalsIgnoreCase(ProductOrderStateEnum.NEW.name())) {
+                    // 订单还未被取消，重新投放消息
+                    return false;
+                }
+
+            }
+
+            log.error("订单不存在或被取消：{}", productMessage);
+            // 设置任务为取消状态
+            productTask.setLockState(ProductTaskStatusEnum.CANCEL.name());
+            productTaskMapper.updateById(productTask);
+
+            // 恢复库存
+            productMapper.changLockStockById(productTask.getProductId(), productTask.getBuyNum());
+        } else {
+            log.warn("任务单不是锁定状态，不进行处理：{}", productMessage);
+        }
+        return true;
     }
 
     private boolean hasPermission(Long userId, String outTradeNo) {

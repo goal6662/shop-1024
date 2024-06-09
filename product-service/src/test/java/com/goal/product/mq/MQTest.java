@@ -1,5 +1,6 @@
 package com.goal.product.mq;
 
+import com.goal.domain.ProductMessage;
 import com.goal.product.ProductApplication;
 import com.goal.utils.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +21,12 @@ public class MQTest {
 
     @Test
     public void mqTest() {
-        rabbitMQService.sendMessageToDelayQueue(Result.success("Hello RabbitMQ"));
+
+        ProductMessage productMessage = new ProductMessage();
+        productMessage.setTaskId(1L);
+        productMessage.setOutTradeNo("123456");
+
+        rabbitMQService.sendMessageToDelayQueue(productMessage);
     }
 
 }
