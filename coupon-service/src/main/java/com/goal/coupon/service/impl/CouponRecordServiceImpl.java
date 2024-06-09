@@ -12,6 +12,7 @@ import com.goal.coupon.domain.vo.CouponRecordVO;
 import com.goal.coupon.mapper.CouponTaskMapper;
 import com.goal.coupon.service.CouponRecordService;
 import com.goal.coupon.mapper.CouponRecordMapper;
+import com.goal.domain.CouponRecordMessage;
 import com.goal.enums.BizCodeEnum;
 import com.goal.exception.BizException;
 import com.goal.utils.Result;
@@ -43,6 +44,8 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
     @Resource
     private CouponTaskMapper couponTaskMapper;
 
+    @Resource
+    private RabbitMQService rabbitMQService;
 
     @Override
     public Result pageUserCouponRecord(int page, int size) {
@@ -123,7 +126,15 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
 
         // 4. 发送延迟消息
         if (lockCouponRecordIds.size() == updateRow && updateRow == insertRows) {
-            // TODO: 2024/6/9 执行正常，发送延迟消息
+            // 执行正常，发送延迟消息
+            for (CouponTask couponTask : couponTaskList) {
+                CouponRecordMessage couponRecordMessage = new CouponRecordMessage();
+                couponRecordMessage.setTaskId(couponTask.getId());
+                couponRecordMessage.setOutTradeNo(orderOutTradeNo);
+
+                rabbitMQService.sendCouponRecordTaskMsg(couponRecordMessage);
+            }
+
 
             return Result.success();
         } else {
