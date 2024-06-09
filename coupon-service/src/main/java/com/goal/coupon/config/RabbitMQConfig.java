@@ -93,8 +93,8 @@ public class RabbitMQConfig {
 
         Map<String, Object> args = new HashMap<>(3);
         args.put("x-message-ttl", ttl);
-        args.put("x-dead-letter-exchange", releaseRoutingKey);  // 死信队列
-        args.put("x-dead-letter-routing-key", eventExchange);   // 死信交换机
+        args.put("x-dead-letter-exchange", eventExchange);  // 死信交换机
+        args.put("x-dead-letter-routing-key", releaseRoutingKey);   // 死信队列路由
 
         return new Queue(releaseDelayQueue,
                 true, false, false,
