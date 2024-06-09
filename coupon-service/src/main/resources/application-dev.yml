@@ -6,3 +6,8 @@ shop:
     host: ip
     port: port
     pwd: password
+  rabbitmq:
+    host: ip # rabbitMQ的ip地址
+    port: port # 端口
+    username: name
+    password: pwd

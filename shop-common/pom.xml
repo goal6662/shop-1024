@@ -19,6 +19,12 @@
 
     <dependencies>
 
+        <!--AMQP依赖，包含RabbitMQ-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
         <!-- Seata：对性能影响很大，尽量避免使用 -->
         <!-- <dependency> -->
         <!--     <groupId>com.alibaba.cloud</groupId> -->

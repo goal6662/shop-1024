@@ -21,6 +21,17 @@ spring:
     host: ${shop.redis.host}
     port: ${shop.redis.port}
     password: ${shop.redis.pwd}
+  # rabbitmq
+  rabbitmq:
+    host: ${shop.rabbitmq.host}
+    port: ${shop.rabbitmq.port} # 端口
+    username: ${shop.rabbitmq.username}
+    password: ${shop.rabbitmq.password}
+    virtual-host: /
+    listener:
+      simple:
+        prefetch: 1   # 预拉取消息数1：当前1条消息处理完成后，才能继续接收消息
+        acknowledge-mode: manual  # 手动确认消息
 mybatis-plus:
   configuration:
     # mp日志
