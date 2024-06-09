@@ -4,6 +4,7 @@ import com.goal.coupon.domain.dto.CouponLockDTO;
 import com.goal.coupon.domain.po.CouponRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.coupon.domain.vo.CouponRecordVO;
+import com.goal.domain.CouponRecordMessage;
 import com.goal.utils.Result;
 
 /**
@@ -33,4 +34,11 @@ public interface CouponRecordService extends IService<CouponRecord> {
      * @param couponLockDTO
      */
     Result lockCouponRecords(CouponLockDTO couponLockDTO);
+
+    /**
+     * 释放优惠券记录
+     * @param couponRecordMessage 消息对象
+     * @return true: 消息处理成功、false: 消息处理失败
+     */
+    boolean releaseCouponRecord(CouponRecordMessage couponRecordMessage);
 }

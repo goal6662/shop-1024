@@ -28,4 +28,12 @@
         user_id,del,update_time,
         order_type,receiver_address
     </sql>
+    <select id="getStateByOutTradeNo" resultType="com.goal.order.domain.po.ProductOrder">
+        select
+            state
+        from
+            shop_order.product_order
+        where
+            out_trade_no = #{outTradeNo}
+    </select>
 </mapper>

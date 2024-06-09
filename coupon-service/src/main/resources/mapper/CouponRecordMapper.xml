@@ -40,6 +40,11 @@
                     #{id}
                 </foreach>
     </update>
+    <update id="changeRecordStateById">
+        update shop_coupon.coupon_record
+        set use_state = #{status}
+        where id = #{id}
+    </update>
     <select id="getUserClaimCount" resultType="java.lang.Integer">
         select count(*)
         from

@@ -9,11 +9,13 @@ import com.goal.coupon.domain.enums.CouponTaskStatusEnum;
 import com.goal.coupon.domain.po.CouponRecord;
 import com.goal.coupon.domain.po.CouponTask;
 import com.goal.coupon.domain.vo.CouponRecordVO;
+import com.goal.coupon.feign.OrderFeignService;
 import com.goal.coupon.mapper.CouponTaskMapper;
 import com.goal.coupon.service.CouponRecordService;
 import com.goal.coupon.mapper.CouponRecordMapper;
 import com.goal.domain.CouponRecordMessage;
 import com.goal.enums.BizCodeEnum;
+import com.goal.enums.order.ProductOrderStateEnum;
 import com.goal.exception.BizException;
 import com.goal.utils.Result;
 import com.goal.utils.UserContext;
@@ -46,6 +48,10 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
 
     @Resource
     private RabbitMQService rabbitMQService;
+
+    @Resource
+    private OrderFeignService orderFeignService;
+
 
     @Override
     public Result pageUserCouponRecord(int page, int size) {
@@ -140,6 +146,52 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
         } else {
             // 抛出异常用于回滚数据
             throw new BizException(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
+        }
+    }
+
+    /**
+     *
+     * @param couponRecordMessage 消息对象
+     * @return
+     */
+    @Override
+    public boolean releaseCouponRecord(CouponRecordMessage couponRecordMessage) {
+        // TODO: 2024/6/9 释放优惠券记录
+        // 1. 查找任务task释放存在
+        CouponTask couponTask = couponTaskMapper.selectById(couponRecordMessage.getTaskId());
+        if (couponTask == null) {
+            log.warn("优惠券task任务不存在：{}", couponRecordMessage);
+            return true;
+        }
+
+        // 2. 任务是锁定状态才需要处理
+        if (couponTask.getLockState().equalsIgnoreCase(CouponTaskStatusEnum.LOCK.name())) {
+
+            Result<String> result = orderFeignService.queryProductOrderState(couponTask.getOutTradeNo());
+
+            // 远程调用成功
+            if (result.getCode() == BizCodeEnum.OPS_SUCCESS.getCode()) {
+                String state = result.getData();
+                if (state.equalsIgnoreCase(ProductOrderStateEnum.PAY.name())) {
+                    // 订单已支付，设置任务状态为完成
+                    couponTask.setLockState(CouponTaskStatusEnum.FINISH.name());
+                    couponTaskMapper.updateById(couponTask);
+                } else if (state.equalsIgnoreCase(ProductOrderStateEnum.NEW.name())) {
+                    // 订单是新建状态
+                    log.warn("订单状态为NEW，返回给消息队列重新投递");
+                    return false;
+                }
+            }
+
+            log.warn("订单不存在，释放记录：{}", couponTask.getOutTradeNo());
+            couponTask.setLockState(CouponTaskStatusEnum.CANCEL.name());
+            couponTaskMapper.updateById(couponTask);
+
+            couponRecordMapper.changeRecordStateById(couponTask.getCouponRecordId(), CouponRecordStatusEnum.NEW.name());
+            return true;
+        } else {
+            log.warn("task状态非LOCK，state：{}，消息体：{}", couponTask.getLockState(), couponRecordMessage);
+            return true;
         }
     }
 

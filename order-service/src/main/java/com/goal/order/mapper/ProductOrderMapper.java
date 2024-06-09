@@ -2,6 +2,7 @@ package com.goal.order.mapper;
 
 import com.goal.order.domain.po.ProductOrder;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author Goal
@@ -11,6 +12,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface ProductOrderMapper extends BaseMapper<ProductOrder> {
 
+    /**
+     * 根据订单号查询订单状态
+     * @param outTradeNo 订单号
+     * @return 订单
+     */
+    ProductOrder getStateByOutTradeNo(@Param("outTradeNo") String outTradeNo);
 }
 
 

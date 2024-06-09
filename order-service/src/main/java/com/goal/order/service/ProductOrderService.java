@@ -18,4 +18,18 @@ public interface ProductOrderService extends IService<ProductOrder> {
      * @return
      */
     Result submitOrder(OrderConfirmDTO orderConfirmDTO);
+
+    /**
+     * 查询订单状态
+     * @param id 订单ID
+     * @return 订单状态
+     */
+    Result<String> getOrderStateById(Long id);
+
+    /**
+     * 根据订单号查询订单状态
+     * @param outTradeNo 订单号
+     * @return 订单状态
+     */
+    Result<String> getOrderStateByOutTradeNo(String outTradeNo);
 }

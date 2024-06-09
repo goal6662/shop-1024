@@ -1,12 +1,16 @@
 package com.goal.order.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.goal.enums.BizCodeEnum;
+import com.goal.exception.BizException;
 import com.goal.order.domain.dto.OrderConfirmDTO;
 import com.goal.order.domain.po.ProductOrder;
 import com.goal.order.service.ProductOrderService;
 import com.goal.order.mapper.ProductOrderMapper;
 import com.goal.utils.Result;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 /**
 * @author Goal
@@ -16,6 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, ProductOrder>
     implements ProductOrderService{
+
+    @Resource
+    private ProductOrderMapper productOrderMapper;
 
     /**
      * 防止重复提交
@@ -36,6 +43,22 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     public Result submitOrder(OrderConfirmDTO orderConfirmDTO) {
         // TODO: 2024/6/6 创建订单
         return null;
+    }
+
+    @Override
+    public Result<String> getOrderStateById(Long id) {
+        ProductOrder productOrder = productOrderMapper.selectById(id);
+        return Result.success(productOrder.getState());
+    }
+
+    @Override
+    public Result<String> getOrderStateByOutTradeNo(String outTradeNo) {
+        ProductOrder productOrder = productOrderMapper.getStateByOutTradeNo(outTradeNo);
+
+        if (productOrder == null) {
+            throw new BizException(BizCodeEnum.ORDER_NO_EXIST);
+        }
+        return Result.success(productOrder.getState());
     }
 }
 

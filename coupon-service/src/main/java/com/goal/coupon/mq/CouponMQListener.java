@@ -20,6 +20,13 @@ public class CouponMQListener {
     @Resource
     private CouponRecordService couponRecordService;
 
+    /**
+     * 监听优惠券记录消息
+     * @param couponRecordMessage 消息类型，不是该类型的消息不会被接收
+     * @param message
+     * @param channel
+     * @throws IOException
+     */
     @RabbitHandler
     public void releaseCouponRecord(CouponRecordMessage couponRecordMessage,
                                     Message message, Channel channel) throws IOException {

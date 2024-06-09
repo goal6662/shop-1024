@@ -11,10 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +27,12 @@ public class ProductOrderController {
 
     @Resource
     private ProductOrderService productOrderService;
+
+    @ApiOperation("查询订单状态")
+    @GetMapping("query_state/{out_trade_no}")
+    public Result<String> getState(@ApiParam("订单号") @PathVariable("out_trade_no") String outTradeNo) {
+       return productOrderService.getOrderStateByOutTradeNo(outTradeNo);
+    }
 
 
     @ApiOperation("创建订单")

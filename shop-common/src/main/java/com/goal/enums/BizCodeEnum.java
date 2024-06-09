@@ -50,6 +50,11 @@ public enum BizCodeEnum {
     PRODUCT_UNAVAILABLE(270001, "当前商品不可以使用"),
     PRODUCT_MODIFY_ERROR(270002, "修改商品信息失败"),
 
+    /**
+     * 订单相关
+     */
+    ORDER_NO_EXIST(280001, "订单不存在"),
+
 
     /**
      * 优惠券相关
