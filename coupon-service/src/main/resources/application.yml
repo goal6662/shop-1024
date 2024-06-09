@@ -28,7 +28,7 @@ spring:
     port: ${shop.rabbitmq.port} # 端口
     username: ${shop.rabbitmq.username}
     password: ${shop.rabbitmq.password}
-    virtual-host: /
+    virtual-host: ${shop.rabbitmq.virtual-host}
     listener:
       simple:
         prefetch: 1   # 预拉取消息数1：当前1条消息处理完成后，才能继续接收消息
@@ -54,6 +54,24 @@ feign:
   okhttp:
     enabled: true  # 开启连接池支持
 
+
+#自定义消息队列配置，发送锁定库存消息 -> 延迟exchange -> lock.queue -> 死信exchange -> release.queue
+mq:
+  config:
+    coupon:
+      #延迟队列，不能被监听消费
+      release_delay_queue: coupon.release.delay.queue
+      #延迟队列的消息过期后转发的队列
+      release_queue: coupon.release.queue
+      #交换机
+      event_exchange: coupon.event.exchange
+      #进入延迟队列的路由key
+      release_delay_routing_key: coupon.release.delay.routing.key
+      #消息过期，进入释放死信队列的key
+      release_routing_key: coupon.release.routing.key
+      #消息过期时间,毫秒,测试改为15秒
+    ttl: 15000
+
 #seata:
 #  tx-service-group: ${spring.application.name}-group
 #  service:
@@ -61,3 +79,4 @@ feign:
 #      shop: 192.168.121.153:8099
 #    vgroup-mapping:
 #      coupon-service-group: shop
+
