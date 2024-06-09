@@ -1,5 +1,6 @@
 package com.goal.product.controller;
 
+import com.goal.product.domain.dto.ProductLockDTO;
 import com.goal.product.domain.vo.ProductVO;
 import com.goal.product.service.ProductService;
 import com.goal.utils.Result;
@@ -34,6 +35,15 @@ public class ProductController {
             @ApiParam("每页记录数") @RequestParam(value = "size", defaultValue = "30") int size
     ) {
         return productService.pageProduct(page, size);
+    }
+
+    @ApiOperation("锁定库存信息")
+    @PostMapping("lock_products")
+    public Result lockProducts(
+            @ApiParam("锁定库存信息") @RequestBody ProductLockDTO productLockDTO
+            ) {
+        Result result = productService.lockProducts(productLockDTO);
+        return result;
     }
 
 }

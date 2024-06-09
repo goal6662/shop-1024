@@ -16,6 +16,14 @@ import java.util.List;
 public interface ProductMapper extends BaseMapper<Product> {
 
     List<Product> listByIdBatch(@Param("idList") List<Long> productIdList);
+
+    /**
+     * 锁定商品库存
+     * @param productId 商品id
+     * @param buyNum 锁定的数量
+     * @return 影响行数
+     */
+    int lockProductStock(@Param("productId") long productId, @Param("buyNum") int buyNum);
 }
 
 

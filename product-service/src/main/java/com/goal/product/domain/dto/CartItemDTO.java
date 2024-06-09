@@ -8,7 +8,7 @@ public class CartItemDTO {
     /**
      * 商品id
      */
-    private long id;
+    private long productId;
 
     /**
      * 购买数量

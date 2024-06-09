@@ -3,18 +3,28 @@ package com.goal.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.goal.enums.BizCodeEnum;
+import com.goal.exception.BizException;
+import com.goal.product.domain.ProductTaskStatusEnum;
+import com.goal.product.domain.dto.CartItemDTO;
+import com.goal.product.domain.dto.ProductLockDTO;
 import com.goal.product.domain.po.Product;
+import com.goal.product.domain.po.ProductTask;
 import com.goal.product.domain.vo.ProductVO;
+import com.goal.product.mapper.ProductTaskMapper;
 import com.goal.product.service.ProductService;
 import com.goal.product.mapper.ProductMapper;
 import com.goal.utils.Result;
+import com.goal.utils.UserContext;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +38,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
 
     @Resource
     private ProductMapper productMapper;
+
+    @Resource
+    private ProductTaskMapper productTaskMapper;
 
     @Override
     public Result pageProduct(int page, int size) {
@@ -61,6 +74,62 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
 
         List<Product> products = productMapper.listByIdBatch(productIdList);
         return products.stream().map(this::transferToVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Result lockProducts(ProductLockDTO productLockDTO) {
+
+        Long userId = UserContext.getUser().getId();
+        // 获取订单号
+        String outTradeNo = productLockDTO.getOutTradeNo();
+
+        if (!hasPermission(userId, outTradeNo)) {
+            throw new BizException(BizCodeEnum.ORDER_NO_EXIST);
+        }
+
+        List<CartItemDTO> orderItemList = productLockDTO.getOrderItemList();
+
+
+
+        // 获取商品项ID
+        List<Long> orderItemIdList = orderItemList.stream().map(CartItemDTO::getProductId)
+                .collect(Collectors.toList());
+
+        // 查询对应的商品项
+        List<ProductVO> productVOList = findProductByIdBatch(orderItemIdList);
+        Map<Long, ProductVO> productVOMap = productVOList.stream()
+                .collect(Collectors.toMap(ProductVO::getId, Function.identity()));
+
+        for (CartItemDTO item : orderItemList) {
+            int rows = productMapper.lockProductStock(item.getProductId(), item.getBuyNum());
+            if (rows != 1) {
+                // 库存锁定失败
+                throw new BizException(BizCodeEnum.PRODUCT_NO_STOCK);
+            } else {
+                // 插入锁定记录
+                ProductVO productVO = productVOMap.get(item.getProductId());
+                ProductTask productTask = new ProductTask();
+
+                productTask.setProductId(item.getProductId());
+                productTask.setProductName(productVO.getTitle());
+                productTask.setBuyNum(item.getBuyNum());
+                productTask.setLockState(ProductTaskStatusEnum.LOCK.name());
+                productTask.setCreateTime(new Date());
+                productTask.setOutTradeNo(outTradeNo);
+
+                productTaskMapper.insert(productTask);
+
+                // TODO: 2024/6/9 发送延迟消息，恢复商品库存
+            }
+        }
+
+
+        return null;
+    }
+
+    private boolean hasPermission(Long userId, String outTradeNo) {
+        // TODO: 2024/6/9 查询用户是否拥有该订单
+        return true;
     }
 
     private ProductVO transferToVO(Product product) {

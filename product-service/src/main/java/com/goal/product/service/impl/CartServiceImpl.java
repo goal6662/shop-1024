@@ -35,7 +35,7 @@ public class CartServiceImpl extends AbstractCartService implements CartService 
     public void addToCart(CartItemDTO cartItemDTO) {
 
         // 1. 获取商品数据
-        long productId = cartItemDTO.getId();
+        long productId = cartItemDTO.getProductId();
         int buyNum = cartItemDTO.getBuyNum();
 
         // 2. 获取购物车

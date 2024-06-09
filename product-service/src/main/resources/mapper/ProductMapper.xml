@@ -21,6 +21,15 @@
         detail,old_price,price,
         stock,create_time,lock_stock
     </sql>
+    <!-- 锁定商品库存 -->
+    <update id="lockProductStock">
+        update
+            shop_product.product
+        set
+            lock_stock = lock_stock + #{buyNum}
+        where
+            id = #{productId} and  stock >= lock_stock + #{buyNum}
+    </update>
 
     <!--
         1. item 代表集合的元素

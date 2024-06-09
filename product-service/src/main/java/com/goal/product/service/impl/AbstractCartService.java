@@ -36,7 +36,7 @@ abstract public class AbstractCartService implements CartService {
         BoundHashOperations<String, Object, Object> myCart = getCartOps();
 
         // 从缓存查询购物项
-        Object cacheObj = myCart.get(cartItemDTO.getId());
+        Object cacheObj = myCart.get(cartItemDTO.getProductId());
         if (cacheObj == null) {
             throw new BizException(BizCodeEnum.PRODUCT_MODIFY_ERROR);
         }

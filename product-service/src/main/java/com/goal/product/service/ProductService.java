@@ -1,5 +1,6 @@
 package com.goal.product.service;
 
+import com.goal.product.domain.dto.ProductLockDTO;
 import com.goal.product.domain.po.Product;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.product.domain.vo.ProductVO;
@@ -29,4 +30,11 @@ public interface ProductService extends IService<Product> {
      * @return
      */
     List<ProductVO> findProductByIdBatch(List<Long> productIdList);
+
+    /**
+     * 锁定商品库存
+     * @param productLockDTO
+     * @return
+     */
+    Result lockProducts(ProductLockDTO productLockDTO);
 }
