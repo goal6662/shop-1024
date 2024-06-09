@@ -3,6 +3,7 @@ package com.goal.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.goal.domain.ProductMessage;
 import com.goal.enums.BizCodeEnum;
 import com.goal.exception.BizException;
 import com.goal.product.domain.ProductTaskStatusEnum;
@@ -12,10 +13,12 @@ import com.goal.product.domain.po.Product;
 import com.goal.product.domain.po.ProductTask;
 import com.goal.product.domain.vo.ProductVO;
 import com.goal.product.mapper.ProductTaskMapper;
+import com.goal.product.mq.RabbitMQService;
 import com.goal.product.service.ProductService;
 import com.goal.product.mapper.ProductMapper;
 import com.goal.utils.Result;
 import com.goal.utils.UserContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,7 @@ import java.util.stream.Collectors;
 * @description 针对表【product】的数据库操作Service实现
 * @createDate 2024-06-04 19:12:59
 */
+@Slf4j
 @Service
 public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
     implements ProductService {
@@ -41,6 +45,9 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
 
     @Resource
     private ProductTaskMapper productTaskMapper;
+
+    @Resource
+    private RabbitMQService rabbitMQService;
 
     @Override
     public Result pageProduct(int page, int size) {
@@ -89,8 +96,6 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
 
         List<CartItemDTO> orderItemList = productLockDTO.getOrderItemList();
 
-
-
         // 获取商品项ID
         List<Long> orderItemIdList = orderItemList.stream().map(CartItemDTO::getProductId)
                 .collect(Collectors.toList());
@@ -118,13 +123,20 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
                 productTask.setOutTradeNo(outTradeNo);
 
                 productTaskMapper.insert(productTask);
+                log.info("商品库存锁定，插入task任务：{}", productTask);
 
-                // TODO: 2024/6/9 发送延迟消息，恢复商品库存
+                // 发送延迟消息，恢复商品库存
+                ProductMessage productMessage = new ProductMessage();
+
+                productMessage.setOutTradeNo(outTradeNo);
+                productMessage.setTaskId(productTask.getId());
+
+                // 发送延迟消息
+                rabbitMQService.sendMessageToDelayQueue(productMessage);
+                log.info("商品库存锁定，延迟消息发送成功：{}", productMessage);
             }
         }
-
-
-        return null;
+        return Result.success();
     }
 
     private boolean hasPermission(Long userId, String outTradeNo) {
