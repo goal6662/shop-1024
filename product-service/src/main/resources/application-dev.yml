@@ -11,6 +11,8 @@ shop:
     port: port # 端口
     username: name
     password: pwd
+    virtual-host: /
+
 aliyun:
   oss:
     endpoint: 1

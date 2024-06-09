@@ -27,7 +27,7 @@ spring:
     port: ${shop.rabbitmq.port} # 端口
     username: ${shop.rabbitmq.username}
     password: ${shop.rabbitmq.password}
-    virtual-host: /
+    virtual-host: ${shop.rabbitmq.virtual-host}
     listener:
       simple:
         prefetch: 1   # 预拉取消息数1：当前1条消息处理完成后，才能继续接收消息
