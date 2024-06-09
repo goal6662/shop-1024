@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.goal.coupon.mapper.CouponTaskMapper">
+
+    <resultMap id="BaseResultMap" type="com.goal.coupon.domain.po.CouponTask">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="couponRecordId" column="coupon_record_id" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="outTradeNo" column="out_trade_no" jdbcType="VARCHAR"/>
+            <result property="lockState" column="lock_state" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,coupon_record_id,create_time,
+        out_trade_no,lock_state
+    </sql>
+</mapper>
