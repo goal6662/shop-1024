@@ -16,7 +16,7 @@ public interface CouponFeignService {
     @GetMapping("api/${app.config.api.version}/coupon_record/detail/{record_id}")
     Result<CouponRecordVO> findUserCouponRecordById(@PathVariable("record_id") long recordId);
 
-    @PostMapping("lock_record")
+    @PostMapping("api/${app.config.api.version}/coupon_record/lock_record")
     Result lockCouponRecords(@RequestBody CouponLockDTO couponLockDTO);
 
 }

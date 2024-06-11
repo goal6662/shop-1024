@@ -14,7 +14,7 @@
             <result property="payType" column="pay_type" jdbcType="VARCHAR"/>
             <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
             <result property="headImg" column="head_img" jdbcType="VARCHAR"/>
-            <result property="userId" column="user_id" jdbcType="INTEGER"/>
+            <result property="userId" column="user_id" jdbcType="BIGINT"/>
             <result property="del" column="del" jdbcType="INTEGER"/>
             <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
             <result property="orderType" column="order_type" jdbcType="VARCHAR"/>
