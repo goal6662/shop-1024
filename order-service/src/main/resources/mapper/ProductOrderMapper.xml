@@ -28,6 +28,14 @@
         user_id,del,update_time,
         order_type,receiver_address
     </sql>
+    <update id="updateOrderPayStatus">
+        update
+            shop_order.product_order
+        set
+            `state` = #{to}
+        where
+            `state` = #{from} and out_trade_no = #{outTradeNo}
+    </update>
     <select id="getStateByOutTradeNo" resultType="com.goal.order.domain.po.ProductOrder">
         select
             state

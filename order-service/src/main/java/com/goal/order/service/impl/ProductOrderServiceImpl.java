@@ -30,7 +30,9 @@ import com.goal.utils.CommonUtil;
 import com.goal.utils.Result;
 import com.goal.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -82,6 +84,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result submitOrder(OrderConfirmDTO orderConfirmDTO) {
 
         LoginUser loginUser = UserContext.getUser();
@@ -339,8 +342,34 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Override
     public boolean timeoutCloseOrder(TimeoutCloseOrderMessage closeOrderMessage) {
-        // TODO: 2024/6/11 超时关单
-        return false;
+        String outTradeNo = closeOrderMessage.getOutTradeNo();
+        // 1. 查询订单状态
+        ProductOrder productOrder = productOrderMapper.getStateByOutTradeNo(outTradeNo);
+        if (productOrder == null) {
+            log.warn("直接确认消息，订单不存在：{}", closeOrderMessage);
+            return true;
+        }
+
+        // 2. 订单已支付
+        if (productOrder.getState().equalsIgnoreCase(ProductOrderStateEnum.PAY.name())) {
+            log.warn("订单已支付：{}", closeOrderMessage);
+            return true;
+        }
+
+        // TODO: 2024/6/11 向第三方发送请求查询订单是否支付
+        String payResult = "";
+        if (StringUtils.isBlank(payResult)) {
+            // 订单未支付，超时关单，变更订单状态
+            int rows = productOrderMapper.updateOrderPayStatus(outTradeNo, ProductOrderStateEnum.CANCEL.name(),
+                    ProductOrderStateEnum.CANCEL.name());
+            log.info("订单未支付，取消订单：{}", closeOrderMessage);
+        } else {
+            // 订单支付成功
+            int rows = productOrderMapper.updateOrderPayStatus(outTradeNo, ProductOrderStateEnum.PAY.name(),
+                    ProductOrderStateEnum.NEW.name());
+            log.warn("订单支付成功，之前未接受到回调信息，注意排查：{}", closeOrderMessage);
+        }
+        return true;
     }
 }
 
