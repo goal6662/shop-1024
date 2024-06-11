@@ -1,7 +1,7 @@
 package com.goal.coupon.service.impl;
 
 import com.goal.coupon.config.RabbitMQConfig;
-import com.goal.domain.CouponRecordMessage;
+import com.goal.domain.mq.CouponRecordMessage;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 

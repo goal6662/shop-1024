@@ -3,7 +3,7 @@ package com.goal.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.goal.domain.ProductMessage;
+import com.goal.domain.mq.ProductMessage;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.order.ProductOrderStateEnum;
 import com.goal.exception.BizException;
@@ -21,7 +21,6 @@ import com.goal.product.mapper.ProductMapper;
 import com.goal.utils.Result;
 import com.goal.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 

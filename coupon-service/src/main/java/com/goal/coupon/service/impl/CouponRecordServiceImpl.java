@@ -13,7 +13,7 @@ import com.goal.coupon.feign.OrderFeignService;
 import com.goal.coupon.mapper.CouponTaskMapper;
 import com.goal.coupon.service.CouponRecordService;
 import com.goal.coupon.mapper.CouponRecordMapper;
-import com.goal.domain.CouponRecordMessage;
+import com.goal.domain.mq.CouponRecordMessage;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.order.ProductOrderStateEnum;
 import com.goal.exception.BizException;

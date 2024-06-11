@@ -1,6 +1,6 @@
 package com.goal.product.mq;
 
-import com.goal.domain.ProductMessage;
+import com.goal.domain.mq.ProductMessage;
 import com.goal.product.service.ProductService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;

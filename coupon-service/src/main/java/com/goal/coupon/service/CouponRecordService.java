@@ -4,7 +4,7 @@ import com.goal.coupon.domain.dto.CouponLockDTO;
 import com.goal.coupon.domain.po.CouponRecord;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.coupon.domain.vo.CouponRecordVO;
-import com.goal.domain.CouponRecordMessage;
+import com.goal.domain.mq.CouponRecordMessage;
 import com.goal.utils.Result;
 
 /**

@@ -1,7 +1,7 @@
 package com.goal.product.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.goal.domain.ProductMessage;
+import com.goal.domain.mq.ProductMessage;
 import com.goal.product.domain.dto.ProductLockDTO;
 import com.goal.product.domain.po.Product;
 import com.goal.product.domain.vo.ProductVO;

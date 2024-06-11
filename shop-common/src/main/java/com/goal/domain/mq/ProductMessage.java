@@ -1,9 +1,9 @@
-package com.goal.domain;
+package com.goal.domain.mq;
 
 import lombok.Data;
 
 @Data
-public class CouponRecordMessage {
+public class ProductMessage {
 
     /**
      * 消息ID

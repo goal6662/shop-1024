@@ -1,7 +1,7 @@
 package com.goal.coupon;
 
 import com.goal.coupon.config.RabbitMQConfig;
-import com.goal.domain.CouponRecordMessage;
+import com.goal.domain.mq.CouponRecordMessage;
 import com.goal.enums.BizCodeEnum;
 import com.goal.utils.Result;
 import lombok.extern.slf4j.Slf4j;
