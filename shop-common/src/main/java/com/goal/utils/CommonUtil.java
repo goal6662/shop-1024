@@ -1,5 +1,6 @@
 package com.goal.utils;
 
+import cn.hutool.json.JSONUtil;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -134,4 +135,8 @@ public class CommonUtil {
         return saltString.toString();
     }
 
+
+    public static <T> T toType(Object data, Class<T> beanClass) {
+        return JSONUtil.toBean(JSONUtil.toJsonStr(data), beanClass);
+    }
 }

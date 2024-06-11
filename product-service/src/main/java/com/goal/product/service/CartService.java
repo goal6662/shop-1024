@@ -1,7 +1,11 @@
 package com.goal.product.service;
 
 import com.goal.product.domain.dto.CartItemDTO;
+import com.goal.product.domain.vo.CartItemVO;
 import com.goal.product.domain.vo.CartVO;
+import com.goal.utils.Result;
+
+import java.util.List;
 
 public interface CartService {
     /**
@@ -28,4 +32,11 @@ public interface CartService {
     void deleteItemById(Long productId);
 
     void changeItemNum(CartItemDTO cartItemDTO);
+
+    /**
+     * 返回商品的最新价格，同时从购物车删除该项
+     * @param productIdList
+     * @return
+     */
+    List<CartItemVO> confirmOrderCartItems(List<Long> productIdList);
 }

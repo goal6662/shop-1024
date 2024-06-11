@@ -10,6 +10,7 @@ import com.goal.product.domain.vo.ProductVO;
 import com.goal.product.service.CartService;
 import com.goal.product.service.ProductService;
 import com.goal.utils.UserContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class CartServiceImpl extends AbstractCartService implements CartService {
 
@@ -79,6 +81,27 @@ public class CartServiceImpl extends AbstractCartService implements CartService 
     @Override
     public void clearUserCart() {
         redisTemplate.delete(getCartKey());
+    }
+
+    @Override
+    public List<CartItemVO> confirmOrderCartItems(List<Long> productIdList) {
+
+        // 获取全部购物项以及最新价格
+        List<CartItemVO> cartItemVOList = buildCartItem(true);
+
+        // 获取到所有下单的购物项
+        List<CartItemVO> resultList = cartItemVOList.stream().filter((item) -> {
+            if (productIdList.contains(item.getProductId())) {
+
+                // 删除购物项
+                this.deleteItemById(item.getProductId());
+                return true;
+            }
+            return false;
+        }).collect(Collectors.toList());
+        log.info("本次下单的购物项有：{}", resultList);
+
+        return resultList;
     }
 
     @Override

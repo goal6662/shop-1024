@@ -1,6 +1,7 @@
 package com.goal.product.controller;
 
 import com.goal.product.domain.dto.CartItemDTO;
+import com.goal.product.domain.vo.CartItemVO;
 import com.goal.product.domain.vo.CartVO;
 import com.goal.product.service.CartService;
 import com.goal.utils.Result;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Api("购物车服务")
 @RestController
@@ -18,6 +20,7 @@ public class CartController {
 
     @Resource
     private CartService cartService;
+
 
     @ApiOperation("添加商品到购物车")
     @PostMapping("add")
@@ -30,12 +33,14 @@ public class CartController {
         return Result.success();
     }
 
+
     @ApiOperation("清空购物车")
     @DeleteMapping("clear")
     public Result clearCart() {
         cartService.clearUserCart();
         return Result.success();
     }
+
 
     @ApiOperation("查看我的购物车")
     @GetMapping("/my_cart")
@@ -44,6 +49,7 @@ public class CartController {
 
         return Result.success(cartVO);
     }
+
 
     @ApiOperation("删除购物项")
     @DeleteMapping("delete/{product_id}")
@@ -62,5 +68,15 @@ public class CartController {
     ) {
         cartService.changeItemNum(cartItemDTO);
         return Result.success();
+    }
+
+
+
+    @ApiOperation("查询商品最新价格，并从购物车移除商品")
+    @PostMapping("/confirm_order_cart_items")
+    Result<List<CartItemVO>> confirmOrderCartItem(
+            @ApiParam("商品ID") @RequestBody List<Long> productIdList) {
+        List<CartItemVO> cartItemVOList = cartService.confirmOrderCartItems(productIdList);
+        return Result.success(cartItemVOList);
     }
 }

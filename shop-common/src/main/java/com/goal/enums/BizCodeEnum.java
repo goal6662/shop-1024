@@ -55,6 +55,7 @@ public enum BizCodeEnum {
      * 订单相关
      */
     ORDER_NO_EXIST(280001, "订单不存在"),
+    ORDER_SUBMIT_CART_ITEM_NOT_EXIST(280002, "购物车商品不存在"),
 
 
     /**
