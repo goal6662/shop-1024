@@ -291,6 +291,8 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
                 // 商品总价大于优惠券折扣额度
                 realPayPrice = totalPrice.subtract(couponRecordVO.getPrice());
             }
+        } else {
+            realPayPrice = totalPrice;
         }
 
         // 比较前后端价格是否一致
