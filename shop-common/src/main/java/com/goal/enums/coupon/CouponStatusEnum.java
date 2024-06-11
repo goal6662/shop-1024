@@ -1,4 +1,4 @@
-package com.goal.coupon.domain.enums;
+package com.goal.enums.coupon;
 
 public enum CouponStatusEnum {
 

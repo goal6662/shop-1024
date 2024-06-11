@@ -1,7 +1,7 @@
 package com.goal.coupon.controller;
 
 import com.goal.coupon.domain.dto.CouponNewUserDTO;
-import com.goal.coupon.domain.enums.CouponCategoryEnum;
+import com.goal.enums.coupon.CouponCategoryEnum;
 import com.goal.coupon.service.CouponService;
 import com.goal.utils.Result;
 import io.swagger.annotations.Api;

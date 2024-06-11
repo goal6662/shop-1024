@@ -4,11 +4,14 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.domain.LoginUser;
 import com.goal.enums.BizCodeEnum;
+import com.goal.enums.coupon.CouponRecordStatusEnum;
 import com.goal.exception.BizException;
 import com.goal.order.domain.dto.OrderConfirmDTO;
 import com.goal.order.domain.po.ProductOrder;
 import com.goal.order.domain.vo.CartItemVO;
+import com.goal.order.domain.vo.CouponRecordVO;
 import com.goal.order.domain.vo.ProductOrderAddressVO;
+import com.goal.order.feign.CouponFeignService;
 import com.goal.order.feign.ProductCartFeignService;
 import com.goal.order.feign.UserFeignService;
 import com.goal.order.service.ProductOrderService;
@@ -20,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -40,6 +44,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Resource
     private ProductCartFeignService productCartFeignService;
+
+    @Resource
+    private CouponFeignService couponFeignService;
 
     /**
      * 防止重复提交
@@ -78,15 +85,89 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         }
         log.info("获取商品：{}", cartItemVOList);
 
-
+        this.checkPrice(cartItemVOList, orderConfirmDTO);
 
 
         return null;
     }
 
     /**
+     * 验证价格
+     * @param cartItemVOList 购买商品
+     * @param orderConfirmDTO 请求
+     */
+    private void checkPrice(List<CartItemVO> cartItemVOList, OrderConfirmDTO orderConfirmDTO) {
+
+        // 统计商品总价
+        BigDecimal realPayPrice = BigDecimal.ZERO;
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        if (cartItemVOList != null) {
+            for (CartItemVO cartItemVO : cartItemVOList) {
+                totalPrice = totalPrice.add(cartItemVO.getTotalPrice());
+            }
+        }
+
+        // 获取优惠券，判断是否可用
+        CouponRecordVO couponRecordVO = getCartCouponRecord(orderConfirmDTO.getCouponRecordId());
+        if (couponRecordVO != null) {
+
+            if (totalPrice.compareTo(couponRecordVO.getConditionPrice()) < 0) {
+                // 优惠券不可以使用
+                throw new BizException(BizCodeEnum.COUPON_UNAVAILABLE);
+            }
+
+            // 商品价格不能低于优惠券优惠价格
+            if (totalPrice.compareTo(couponRecordVO.getPrice()) > 0) {
+                // 商品总价大于优惠券折扣额度
+                realPayPrice = totalPrice.subtract(couponRecordVO.getPrice());
+            }
+        }
+
+        // 比较前后端价格是否一致
+        if (totalPrice.compareTo(orderConfirmDTO.getTotalPrice()) != 0
+                || realPayPrice.compareTo(orderConfirmDTO.getRealPayPrice()) != 0) {
+            throw new BizException(BizCodeEnum.ORDER_PRICE_CHANGE);
+        }
+
+    }
+
+    private CouponRecordVO getCartCouponRecord(Long couponRecordId) {
+
+        if (couponRecordId == null || couponRecordId < 0) {
+            return null;
+        }
+
+        Result<CouponRecordVO> result = couponFeignService.findUserCouponRecordById(couponRecordId);
+        if (result.getCode() != BizCodeEnum.OPS_SUCCESS.getCode()) {
+            // 远程调用不成功
+            throw new BizException(BizCodeEnum.COUPON_NOT_EXIST);
+        }
+
+        CouponRecordVO couponRecordVO = result.getData();
+        if (!couponAvailable(couponRecordVO)) {
+            // 优惠券不可用
+            throw new BizException(BizCodeEnum.COUPON_UNAVAILABLE);
+        }
+
+        return couponRecordVO;
+    }
+
+    private boolean couponAvailable(CouponRecordVO couponRecordVO) {
+
+        if (couponRecordVO.getUseState().equalsIgnoreCase(CouponRecordStatusEnum.NEW.name())) {
+            long current = CommonUtil.getCurrentTimeStamp();
+
+            long begin = couponRecordVO.getStartTime().getTime();
+            long end = couponRecordVO.getEndTime().getTime();
+
+            return begin <= current && current <= end;
+
+        }
+        return false;
+    }
+
+    /**
      * 根据ID获取收货地址详情
-     * @param addressId
      * @return
      */
     private ProductOrderAddressVO getUserAddress(Long addressId) {

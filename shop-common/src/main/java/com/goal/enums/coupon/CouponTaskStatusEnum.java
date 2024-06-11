@@ -1,4 +1,4 @@
-package com.goal.coupon.domain.enums;
+package com.goal.enums.coupon;
 
 /**
  * 优惠券任务状态

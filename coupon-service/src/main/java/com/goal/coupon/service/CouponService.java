@@ -1,13 +1,10 @@
 package com.goal.coupon.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.goal.coupon.domain.dto.CouponNewUserDTO;
-import com.goal.coupon.domain.enums.CouponCategoryEnum;
+import com.goal.enums.coupon.CouponCategoryEnum;
 import com.goal.coupon.domain.po.Coupon;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.utils.Result;
-
-import java.util.List;
 
 /**
 * @author Goal

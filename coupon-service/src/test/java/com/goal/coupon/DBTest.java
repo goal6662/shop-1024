@@ -1,6 +1,6 @@
 package com.goal.coupon;
 
-import com.goal.coupon.domain.enums.CouponCategoryEnum;
+import com.goal.enums.coupon.CouponCategoryEnum;
 import com.goal.coupon.domain.po.Coupon;
 import com.goal.coupon.mapper.CouponMapper;
 import org.junit.Test;
