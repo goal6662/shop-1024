@@ -21,13 +21,13 @@ public class TimeoutCloseOrderMQListener {
     private ProductOrderService productOrderService;
 
     /**
-     * 监听优惠券记录消息
+     * 超时关单消息
      * @param closeOrderMessage 消息类型，不是该类型的消息不会被接收
      * @param message 信息
      * @param channel 确认消息
      */
     @RabbitHandler
-    public void releaseCouponRecord(TimeoutCloseOrderMessage closeOrderMessage,
+    public void timeoutCloseOrder(TimeoutCloseOrderMessage closeOrderMessage,
                                     Message message, Channel channel) throws IOException {
 
         log.info("监听到消息：{}", closeOrderMessage);

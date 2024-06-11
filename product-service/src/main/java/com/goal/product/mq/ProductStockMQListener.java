@@ -28,7 +28,7 @@ public class ProductStockMQListener {
      * @throws IOException
      */
     @RabbitHandler
-    public void releaseCouponRecord(ProductMessage productMessage,
+    public void releaseProductStock(ProductMessage productMessage,
                                     Message message, Channel channel) throws IOException {
 
         log.info("监听到消息：{}", productMessage);
