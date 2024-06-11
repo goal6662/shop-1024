@@ -1,6 +1,7 @@
 package com.goal.order.mq;
 
 import com.goal.domain.mq.TimeoutCloseOrderMessage;
+import com.goal.order.domain.mq.CartRecoveryMessage;
 import com.goal.order.service.ProductOrderService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
@@ -50,5 +51,26 @@ public class TimeoutCloseOrderMQListener {
 
     }
 
+    @RabbitHandler
+    public void recoveryCartItems(CartRecoveryMessage recoveryMessage,
+                                  Message message, Channel channel) throws IOException {
+        log.info("监听到消息：{}", recoveryMessage);
+
+        long msgTag = message.getMessageProperties().getDeliveryTag();
+        boolean flag = productOrderService.recoveryCartItems(recoveryMessage);
+
+        try {
+            if (flag) {
+                // 确认消息消费成功
+                channel.basicAck(msgTag, false);
+            } else {
+                log.error("恢复购物车失败：{}", recoveryMessage);
+                channel.basicReject(msgTag, true);  // true 消费失败重新入队
+            }
+        } catch (Exception e) {
+            log.error("恢复购物车异常：{}", e.getMessage());
+            channel.basicReject(msgTag, true);  // true 消费失败重新入队
+        }
+    }
 
 }

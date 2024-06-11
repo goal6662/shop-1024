@@ -22,7 +22,8 @@ public class InterceptorConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/*/product/**", "/api/*/cart/**")
                 .excludePathPatterns(
                         "/api/*/product/page_product",
-                        "/api/*/product/find/*"
+                        "/api/*/product/find/*",
+                        "/api/*/cart/mq/**"
                 );
     }
 }

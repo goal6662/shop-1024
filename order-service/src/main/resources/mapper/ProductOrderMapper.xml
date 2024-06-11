@@ -44,4 +44,12 @@
         where
             out_trade_no = #{outTradeNo}
     </select>
+    <select id="getOrderByOutTradeNo" resultType="com.goal.order.domain.po.ProductOrder">
+        select
+            <include refid="Base_Column_List"/>
+        from
+            shop_order.product_order
+        where
+            out_trade_no = #{outTradeNo}
+    </select>
 </mapper>

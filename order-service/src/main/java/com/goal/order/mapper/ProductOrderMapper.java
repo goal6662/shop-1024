@@ -28,6 +28,13 @@ public interface ProductOrderMapper extends BaseMapper<ProductOrder> {
      */
     int updateOrderPayStatus(@Param("outTradeNo") String outTradeNo, @Param("to") String to,
                              @Param("from") String from);
+
+    /**
+     * 通过订单号获取订单
+     * @param outTradeNo 订单号
+     * @return 订单
+     */
+    ProductOrder getOrderByOutTradeNo(@Param("outTradeNo") String outTradeNo);
 }
 
 

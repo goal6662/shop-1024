@@ -14,6 +14,7 @@ import com.goal.order.domain.dto.CartItemDTO;
 import com.goal.order.domain.dto.CouponLockDTO;
 import com.goal.order.domain.dto.OrderConfirmDTO;
 import com.goal.order.domain.dto.ProductLockDTO;
+import com.goal.order.domain.mq.CartRecoveryMessage;
 import com.goal.order.domain.po.ProductOrder;
 import com.goal.order.domain.po.ProductOrderItem;
 import com.goal.order.domain.vo.CartItemVO;
@@ -31,10 +32,14 @@ import com.goal.utils.Result;
 import com.goal.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -104,6 +109,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
                 || (cartItemVOList = result.getData()) == null) {
             throw new BizException(BizCodeEnum.ORDER_SUBMIT_CART_ITEM_NOT_EXIST);
         }
+        // TODO: 2024/6/11 发送定时任务，恢复购物项
+        sendCartRecoveryMessage(cartItemVOList, orderTradeNo, loginUser.getId());
+
         log.info("获取商品：{}", cartItemVOList);
 
         // 订单验价
@@ -130,6 +138,29 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
 
         return null;
+    }
+
+    /**
+     * 发送 恢复购物车 购物项 的消息
+     * @param cartItemVOList 购物项
+     * @param orderTradeNo 订单号
+     * @param userId 用户ID
+     */
+    private void sendCartRecoveryMessage(List<CartItemVO> cartItemVOList, String orderTradeNo, Long userId) {
+
+        List<CartItemDTO> cartItemDTOList = cartItemVOList.stream().map((item) -> {
+            CartItemDTO cartItemDTO = new CartItemDTO();
+            BeanUtils.copyProperties(item, cartItemDTO);
+            return cartItemDTO;
+        }).collect(Collectors.toList());
+
+        CartRecoveryMessage cartRecoveryMessage = new CartRecoveryMessage();
+        cartRecoveryMessage.setCartItemDTOList(cartItemDTOList);
+        cartRecoveryMessage.setOutTradeNo(orderTradeNo);
+        cartRecoveryMessage.setCartCacheKey(String.valueOf(userId));
+
+        // 10s 存活时间
+        rabbitMQService.sendMessageToDelayQueue(cartRecoveryMessage, 10 * 1000);
     }
 
     private void createProductOrderItems(List<CartItemVO> cartItemVOList, String orderTradeNo, ProductOrder productOrder) {
@@ -370,6 +401,30 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
                     ProductOrderStateEnum.NEW.name());
             log.warn("订单支付成功，之前未接受到回调信息，注意排查：{}", closeOrderMessage);
         }
+        return true;
+    }
+
+    /**
+     * 远程调用不成功需要消息重新入队
+     * @param recoveryMessage 购物项信息
+     * @return
+     */
+    @Override
+    public boolean recoveryCartItems(CartRecoveryMessage recoveryMessage) {
+
+        String outTradeNo = recoveryMessage.getOutTradeNo();
+        // 1. 订单未被创建
+        ProductOrder productOrder = productOrderMapper.getOrderByOutTradeNo(outTradeNo);
+        if (productOrder == null) {
+            // 订单未被创建，执行恢复
+            Result result = productCartFeignService.addCartItems(recoveryMessage.getCartItemDTOList(),
+                    Long.valueOf(recoveryMessage.getCartCacheKey()));
+            if (result.getCode() != BizCodeEnum.OPS_SUCCESS.getCode()) {
+                log.error("购物车恢复失败：{}", recoveryMessage);
+                return false;
+            }
+        }
+
         return true;
     }
 }

@@ -33,6 +33,18 @@ public class CartController {
         return Result.success();
     }
 
+    @ApiOperation("添加商品到购物车")
+    @PostMapping("mq/add/{user_id}")
+    public Result mqAddToCart(
+            @ApiParam("商品信息")
+            @RequestBody List<CartItemDTO> cartItemDTOList,
+            @ApiParam("用户ID")
+            @PathVariable("user_id") Long userId) {
+
+        cartService.addItemsToCart(cartItemDTOList, userId);
+        return Result.success();
+    }
+
 
     @ApiOperation("清空购物车")
     @DeleteMapping("clear")

@@ -2,6 +2,7 @@ package com.goal.order.service;
 
 import com.goal.domain.mq.TimeoutCloseOrderMessage;
 import com.goal.order.domain.dto.OrderConfirmDTO;
+import com.goal.order.domain.mq.CartRecoveryMessage;
 import com.goal.order.domain.po.ProductOrder;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.utils.Result;
@@ -40,4 +41,11 @@ public interface ProductOrderService extends IService<ProductOrder> {
      * @return 消息是否被处理
      */
     boolean timeoutCloseOrder(TimeoutCloseOrderMessage closeOrderMessage);
+
+    /**
+     * 超时未创建订单恢复购物项
+     * @param recoveryMessage 购物项信息
+     * @return 信息是否被处理
+     */
+    boolean recoveryCartItems(CartRecoveryMessage recoveryMessage);
 }

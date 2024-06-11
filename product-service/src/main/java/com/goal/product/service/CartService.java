@@ -39,4 +39,11 @@ public interface CartService {
      * @return
      */
     List<CartItemVO> confirmOrderCartItems(List<Long> productIdList);
+
+    /**
+     * 添加商品到购物车
+     * @param cartItemDTOList
+     * @param userId
+     */
+    void addItemsToCart(List<CartItemDTO> cartItemDTOList, Long userId);
 }
