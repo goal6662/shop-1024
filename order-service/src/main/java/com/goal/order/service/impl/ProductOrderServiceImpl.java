@@ -23,6 +23,7 @@ import com.goal.order.feign.CouponFeignService;
 import com.goal.order.feign.ProductCartFeignService;
 import com.goal.order.feign.UserFeignService;
 import com.goal.order.mapper.ProductOrderItemMapper;
+import com.goal.order.mq.RabbitMQService;
 import com.goal.order.service.ProductOrderService;
 import com.goal.order.mapper.ProductOrderMapper;
 import com.goal.utils.CommonUtil;
@@ -52,6 +53,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Resource
     private ProductOrderItemMapper productOrderItemMapper;
+
+    @Resource
+    private RabbitMQService rabbitMQService;
 
     @Resource
     private UserFeignService userFeignService;
@@ -113,9 +117,13 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         // 创建订单项
         createProductOrderItems(cartItemVOList, orderTradeNo, productOrder);
 
-        // TODO 超时关单
+        // 超时关单
+        TimeoutCloseOrderMessage timeoutCloseOrderMessage = new TimeoutCloseOrderMessage();
+        timeoutCloseOrderMessage.setOutTradeNo(orderTradeNo);
+        rabbitMQService.sendMessageToDelayQueue(timeoutCloseOrderMessage);
 
         // TODO 创建支付
+
 
         return null;
     }

@@ -41,11 +41,11 @@ public class ProductStockMQListener {
                 // 确认消息消费成功
                 channel.basicAck(msgTag, false);
             } else {
-                log.error("释放优惠券失败：{}", productMessage);
+                log.error("释放商品库存失败：{}", productMessage);
                 channel.basicReject(msgTag, true);  // true 消费失败重新入队
             }
         } catch (Exception e) {
-            log.error("释放优惠券异常：{}", e.getMessage());
+            log.error("释放商品库存异常：{}", e.getMessage());
             channel.basicReject(msgTag, true);  // true 消费失败重新入队
         }
 

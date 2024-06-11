@@ -15,7 +15,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RabbitListener(queues = "${mq.config.order.release_queue}")
-public class ProductStockMQListener {
+public class TimeoutCloseOrderMQListener {
 
     @Resource
     private ProductOrderService productOrderService;
@@ -40,11 +40,11 @@ public class ProductStockMQListener {
                 // 确认消息消费成功
                 channel.basicAck(msgTag, false);
             } else {
-                log.error("释放优惠券失败：{}", closeOrderMessage);
+                log.error("超时关单失败：{}", closeOrderMessage);
                 channel.basicReject(msgTag, true);  // true 消费失败重新入队
             }
         } catch (Exception e) {
-            log.error("释放优惠券异常：{}", e.getMessage());
+            log.error("超时关单异常：{}", e.getMessage());
             channel.basicReject(msgTag, true);  // true 消费失败重新入队
         }
 
