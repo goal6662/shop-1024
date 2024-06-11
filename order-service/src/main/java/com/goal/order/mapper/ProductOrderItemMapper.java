@@ -2,6 +2,9 @@ package com.goal.order.mapper;
 
 import com.goal.order.domain.po.ProductOrderItem;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author Goal
@@ -11,6 +14,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface ProductOrderItemMapper extends BaseMapper<ProductOrderItem> {
 
+    /**
+     * 批量插入订单项
+     * @param productOrderItemList
+     * @return
+     */
+    int insertBatch(@Param("itemList") List<ProductOrderItem> productOrderItemList);
 }
 
 

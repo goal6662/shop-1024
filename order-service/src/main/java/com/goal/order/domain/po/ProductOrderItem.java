@@ -65,7 +65,7 @@ public class ProductOrderItem implements Serializable {
     /**
      * 购物项商品单价
      */
-    private Long price;
+    private BigDecimal price;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

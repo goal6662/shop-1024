@@ -5,18 +5,23 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.domain.LoginUser;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.coupon.CouponRecordStatusEnum;
+import com.goal.enums.order.PayTypeEnum;
+import com.goal.enums.order.ProductOrderStateEnum;
+import com.goal.enums.order.ProductOrderTypeEnum;
 import com.goal.exception.BizException;
 import com.goal.order.domain.dto.CartItemDTO;
 import com.goal.order.domain.dto.CouponLockDTO;
 import com.goal.order.domain.dto.OrderConfirmDTO;
 import com.goal.order.domain.dto.ProductLockDTO;
 import com.goal.order.domain.po.ProductOrder;
+import com.goal.order.domain.po.ProductOrderItem;
 import com.goal.order.domain.vo.CartItemVO;
 import com.goal.order.domain.vo.CouponRecordVO;
 import com.goal.order.domain.vo.ProductOrderAddressVO;
 import com.goal.order.feign.CouponFeignService;
 import com.goal.order.feign.ProductCartFeignService;
 import com.goal.order.feign.UserFeignService;
+import com.goal.order.mapper.ProductOrderItemMapper;
 import com.goal.order.service.ProductOrderService;
 import com.goal.order.mapper.ProductOrderMapper;
 import com.goal.utils.CommonUtil;
@@ -27,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,6 +48,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Resource
     private ProductOrderMapper productOrderMapper;
+
+    @Resource
+    private ProductOrderItemMapper productOrderItemMapper;
 
     @Resource
     private UserFeignService userFeignService;
@@ -97,11 +106,66 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         // 锁定优惠券
         this.lockCouponRecord(orderConfirmDTO, orderTradeNo);
 
-        // TODO 创建订单
+        // 创建订单
+        ProductOrder productOrder = createOrder(orderConfirmDTO, loginUser, addressVO, orderTradeNo);
+
+        // 创建订单项
+        createProductOrderItems(cartItemVOList, orderTradeNo, productOrder);
+
+        // TODO 超时关单
 
         // TODO 创建支付
 
         return null;
+    }
+
+    private void createProductOrderItems(List<CartItemVO> cartItemVOList, String orderTradeNo, ProductOrder productOrder) {
+        List<ProductOrderItem> productOrderItemList = cartItemVOList.stream().map((item) -> {
+            ProductOrderItem productOrderItem = new ProductOrderItem();
+
+            // 商品基本信息
+            productOrderItem.setProductId(item.getProductId());
+            productOrderItem.setProductImg(item.getProductImg());
+            productOrderItem.setProductName(item.getProductTitle());
+            productOrderItem.setPrice(item.getPrice());
+
+            productOrderItem.setBuyNum(item.getBuyNum());
+            productOrderItem.setOutTradeNo(orderTradeNo);   // 订单号
+            productOrderItem.setProductOrderId(productOrder.getId());   // 订单ID
+            productOrderItem.setCreateTime(productOrder.getCreateTime());
+
+            productOrderItem.setTotalPrice(item.getTotalPrice());
+
+            return productOrderItem;
+        }).collect(Collectors.toList());
+
+        int rows = productOrderItemMapper.insertBatch(productOrderItemList);
+    }
+
+    private ProductOrder createOrder(OrderConfirmDTO orderConfirmDTO, LoginUser loginUser, ProductOrderAddressVO addressVO, String orderTradeNo) {
+        ProductOrder productOrder = new ProductOrder();
+
+        // 用户相关
+        productOrder.setUserId(loginUser.getId());
+        productOrder.setHeadImg(loginUser.getHeadImg());
+        productOrder.setNickname(loginUser.getName());
+        productOrder.setReceiverAddress(JSONUtil.toJsonStr(addressVO));
+
+        // 订单信息
+        productOrder.setOutTradeNo(orderTradeNo);
+        productOrder.setCreateTime(new Date());
+        productOrder.setDel(0);
+        productOrder.setOrderType(ProductOrderTypeEnum.DAILY.name());
+
+        // 支付相关
+        productOrder.setPayPrice(orderConfirmDTO.getRealPayPrice());
+        productOrder.setTotalPrice(orderConfirmDTO.getTotalPrice());
+        productOrder.setState(ProductOrderStateEnum.NEW.name());
+        productOrder.setPayType(PayTypeEnum.valueOf(orderConfirmDTO.getPayType()).name());
+
+        productOrderMapper.insert(productOrder);
+
+        return productOrder;
     }
 
     /**
