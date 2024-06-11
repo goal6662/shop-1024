@@ -69,6 +69,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     private CouponFeignService couponFeignService;
 
     /**
+     * TODO 可以使用线程池异步执行的有：购物车情空、优惠券锁定、商品库存锁定、订单验价
      * 防止重复提交
      * 用户微服务-确认收获地址
      * 商品微服务-获取购物车购物项的最新价格
@@ -93,7 +94,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         // 获取收货地址信息
         ProductOrderAddressVO addressVO = this.getUserAddress(orderConfirmDTO.getAddressId());
 
-        // 获取用户加入购物车的商品
+        // 购物车清空：获取用户加入购物车的商品
         List<Long> productIdList = orderConfirmDTO.getProductIdList();
 
         Result<List<CartItemVO>> result = productCartFeignService.confirmOrderCartItem(productIdList);
