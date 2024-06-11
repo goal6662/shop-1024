@@ -48,6 +48,24 @@ app:
     api:
       version: v1
 
+#自定义消息队列配置，发送锁定库存消息 -> 延迟exchange -> lock.queue -> 死信exchange -> release.queue
+mq:
+  config:
+    order:
+      #延迟队列，不能被监听消费
+      release_delay_queue: order.release.delay.queue
+      #延迟队列的消息过期后转发的队列
+      release_queue: order.release.queue
+      #交换机
+      event_exchange: order.event.exchange
+      #进入延迟队列的路由key
+      release_delay_routing_key: order.release.delay.routing.key
+      #消息过期，进入释放死信队列的key
+      release_routing_key: order.release.routing.key
+      #消息过期时间,毫秒,测试改为15秒
+    ttl: 15000
+
+
 # aliyunOSS
 aliyun:
   oss:

@@ -1,5 +1,6 @@
 package com.goal.order.service;
 
+import com.goal.domain.mq.TimeoutCloseOrderMessage;
 import com.goal.order.domain.dto.OrderConfirmDTO;
 import com.goal.order.domain.po.ProductOrder;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -32,4 +33,11 @@ public interface ProductOrderService extends IService<ProductOrder> {
      * @return 订单状态
      */
     Result<String> getOrderStateByOutTradeNo(String outTradeNo);
+
+    /**
+     * 超时关单
+     * @param closeOrderMessage 请求信息
+     * @return 消息是否被处理
+     */
+    boolean timeoutCloseOrder(TimeoutCloseOrderMessage closeOrderMessage);
 }

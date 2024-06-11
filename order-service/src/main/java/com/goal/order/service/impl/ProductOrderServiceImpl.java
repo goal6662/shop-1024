@@ -3,6 +3,7 @@ package com.goal.order.service.impl;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.goal.domain.LoginUser;
+import com.goal.domain.mq.TimeoutCloseOrderMessage;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.coupon.CouponRecordStatusEnum;
 import com.goal.enums.order.PayTypeEnum;
@@ -326,6 +327,12 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             throw new BizException(BizCodeEnum.ORDER_NO_EXIST);
         }
         return Result.success(productOrder.getState());
+    }
+
+    @Override
+    public boolean timeoutCloseOrder(TimeoutCloseOrderMessage closeOrderMessage) {
+        // TODO: 2024/6/11 超时关单
+        return false;
     }
 }
 
