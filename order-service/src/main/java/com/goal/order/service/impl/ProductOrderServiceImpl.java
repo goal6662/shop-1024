@@ -6,7 +6,10 @@ import com.goal.domain.LoginUser;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.coupon.CouponRecordStatusEnum;
 import com.goal.exception.BizException;
+import com.goal.order.domain.dto.CartItemDTO;
+import com.goal.order.domain.dto.CouponLockDTO;
 import com.goal.order.domain.dto.OrderConfirmDTO;
+import com.goal.order.domain.dto.ProductLockDTO;
 import com.goal.order.domain.po.ProductOrder;
 import com.goal.order.domain.vo.CartItemVO;
 import com.goal.order.domain.vo.CouponRecordVO;
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
 * @author Goal
@@ -66,7 +70,6 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     @Override
     public Result submitOrder(OrderConfirmDTO orderConfirmDTO) {
 
-        // TODO: 2024/6/6 创建订单
         LoginUser loginUser = UserContext.getUser();
         String orderTradeNo = CommonUtil.getStringNumRandom(32);
 
@@ -85,10 +88,69 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         }
         log.info("获取商品：{}", cartItemVOList);
 
+        // 订单验价
         this.checkPrice(cartItemVOList, orderConfirmDTO);
 
+        // 锁定库存
+        this.lockProductStock(cartItemVOList, orderTradeNo);
+
+        // 锁定优惠券
+        this.lockCouponRecord(orderConfirmDTO, orderTradeNo);
+
+        // TODO 创建订单
+
+        // TODO 创建支付
 
         return null;
+    }
+
+    /**
+     * 锁定库存
+     * @param cartItemVOList 购物项
+     * @param orderTradeNo
+     */
+    private void lockProductStock(List<CartItemVO> cartItemVOList, String orderTradeNo) {
+
+        ProductLockDTO productLockDTO = new ProductLockDTO();
+        // 订单号
+        productLockDTO.setOutTradeNo(orderTradeNo);
+        // 购买物品
+        List<CartItemDTO> cartItemDTOList = cartItemVOList.stream().map((item) -> {
+            CartItemDTO cartItemDTO = new CartItemDTO();
+            cartItemDTO.setProductId(item.getProductId());
+            cartItemDTO.setBuyNum(item.getBuyNum());
+            return cartItemDTO;
+        }).collect(Collectors.toList());
+        productLockDTO.setOrderItemList(cartItemDTOList);
+
+        Result result = productCartFeignService.lockProducts(productLockDTO);
+        if (result.getCode() != BizCodeEnum.OPS_SUCCESS.getCode()) {
+            log.error("锁定商品库存失败：{}", productLockDTO);
+            throw new BizException(BizCodeEnum.PRODUCT_STOCK_LOCK_FAIL);
+        }
+
+    }
+
+    /**
+     * 锁定优惠券
+     * @param orderConfirmDTO
+     * @param orderTradeNo
+     */
+    private void lockCouponRecord(OrderConfirmDTO orderConfirmDTO, String orderTradeNo) {
+
+        if (orderConfirmDTO.getCouponRecordId() < 0) {
+            return;
+        }
+
+        CouponLockDTO couponLockDTO = new CouponLockDTO();
+        couponLockDTO.setOrderOutTradeNo(orderTradeNo);
+        couponLockDTO.setLockCouponRecordIds(List.of(orderConfirmDTO.getCouponRecordId()));
+
+        Result result = couponFeignService.lockCouponRecords(couponLockDTO);
+        if (result.getCode() != BizCodeEnum.OPS_SUCCESS.getCode()) {
+            log.error("锁定优惠券失败：{}", couponLockDTO);
+            throw new BizException(BizCodeEnum.COUPON_RECORD_LOCK_FAIL);
+        }
     }
 
     /**
