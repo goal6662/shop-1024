@@ -49,7 +49,7 @@ public class ProductOrderController {
 
             // 判断支付方式
             if (payType.equalsIgnoreCase(PayTypeEnum.ALIPAY.name())) {
-                log.info("创建支付宝订单成功：{}", orderConfirmDTO);
+                log.info("创建支付宝订单成功：{}", result.getData());
 
                 if (client.equalsIgnoreCase(ClientTypeEnum.APP.name())) {
                     // 写回html数据

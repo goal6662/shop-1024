@@ -15,16 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
 @Api("支付渠道回调")
 @RestController
-@RequestMapping("api/${app.config.api.version}/sale")
+@RequestMapping("api/${app.config.api.version}/callback")
 public class CallbackController {
 
     @Resource
