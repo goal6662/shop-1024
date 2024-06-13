@@ -11,6 +11,7 @@ import com.goal.enums.order.ProductOrderStateEnum;
 import com.goal.enums.order.ProductOrderTypeEnum;
 import com.goal.exception.BizException;
 import com.goal.order.component.PayFactory;
+import com.goal.order.component.strategy.AliPayConstants;
 import com.goal.order.domain.dto.CartItemDTO;
 import com.goal.order.domain.dto.CouponLockDTO;
 import com.goal.order.domain.dto.OrderConfirmDTO;
@@ -445,9 +446,38 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Override
     public Result handlerOrderCallbackMsg(String payType, Map<String, String> paramsMap) {
-        // TODO: 2024/6/13 处理支付回调 
-        return null;
+        // 处理支付回调
+
+        if (payType.equalsIgnoreCase(PayTypeEnum.ALIPAY.name())) {
+            return handlerAlipayCallbackMsg(paramsMap);
+        }
+
+        return Result.fail(BizCodeEnum.PAY_TYPE_NOT_SUPPORT);
     }
+
+    /**
+     * 处理支付宝回调消息
+     * @param paramsMap 消息参数
+     */
+    private Result handlerAlipayCallbackMsg(Map<String, String> paramsMap) {
+
+        // 商户订单号
+        String outTradeNo = paramsMap.get(AliPayConstants.OUT_TRADE_NO);
+        // 交易状态
+        String tradeStatus = paramsMap.get(AliPayConstants.TRADE_STATUS);
+
+        if (tradeStatus.equalsIgnoreCase(AliPayConstants.TRADE_SUCCESS)
+                || tradeStatus.equalsIgnoreCase(AliPayConstants.TRADE_FINISH)) {
+            // 支付成功，更新订单状态 NEW -> PAY
+            productOrderMapper.updateOrderPayStatus(outTradeNo,
+                    ProductOrderStateEnum.PAY.name(), ProductOrderStateEnum.NEW.name());
+
+            return Result.success();
+        }
+
+        return Result.fail(BizCodeEnum.PAY_ORDER_CALLBACK_FAIL);
+    }
+
 }
 
 

@@ -49,6 +49,7 @@ public class AliPayConstants {
      * 支付成功的标识
      */
     public static final String TRADE_SUCCESS = "TRADE_SUCCESS";
+    public static final String TRADE_FINISH = "TRADE_FINISH";
 
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
