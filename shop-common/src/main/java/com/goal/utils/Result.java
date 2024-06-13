@@ -38,4 +38,7 @@ public class Result<T> {
         return new Result<>(BizCodeEnum.OPS_ERROR.getCode(), null, message);
     }
 
+    public static boolean isSuccess(Result result) {
+        return result.getCode() == BizCodeEnum.OPS_SUCCESS.getCode();
+    }
 }

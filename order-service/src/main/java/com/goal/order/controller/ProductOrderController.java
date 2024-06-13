@@ -43,7 +43,7 @@ public class ProductOrderController {
             ) {
         Result result = productOrderService.submitOrder(orderConfirmDTO);
 
-        if (result.getCode() == BizCodeEnum.OPS_SUCCESS.getCode()) {
+        if (Result.isSuccess(result)) {
             String client = orderConfirmDTO.getClientType();
             String payType = orderConfirmDTO.getPayType();
 

@@ -18,3 +18,11 @@ aliyun:
     access-key-id: 2
     access-key-secret: 3
     bucket-name: 4
+# AliPay
+alipay:
+  config:
+    appid: appid
+    private-key: private-key
+    alipay-public-key: alipay-public-key
+    notify-url: notify-url
+    return-url: return-url

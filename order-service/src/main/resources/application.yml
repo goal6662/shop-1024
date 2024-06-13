@@ -77,6 +77,41 @@ feign:
   okhttp:
     enabled: true  # 开启连接池支持
 
+# AliPay
+alipay:
+  config:
+    # 请在完全配置好支付信息后开启
+    enabled: true
+    # (必须 - 本处是沙箱网关) 支付宝网关
+    server-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+    # (必须) 开发者id
+    appid: ${alipay.config.appid}
+    # (必须) 开发者私钥 由开发者自己生成
+    private-key: ${alipay.config.private-key}
+    # (必须 - 固定值) 参数返回格式，只支持 JSON 格式
+    format: JSON
+    # (必须 - 推荐值) 编码集，支持 GBK/UTF-8
+    charset: UTF-8
+    # (必须) 支付宝公钥
+    alipay-public-key: ${alipay.config.alipay-public-key}
+    # (必须 - 推荐值) 生成签名字符串所使用的签名算法类型，目前支持 RSA2 和 RSA，推荐使用 RSA2
+    sign-type: RSA2
+    # (非必须 - 极力推荐填写) 服务器异步通知页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问：支付完成后，支付宝调用该地址
+    notify-url: ${alipay.config.notify-url}
+    # (非必须 - 推荐填写) 页面跳转同步通知页面路径 需http(s)://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
+    return-url: ${alipay.config.return-url}
+
+# 线程池配置
+thread:
+  pool:
+    executor:
+      config:
+        core-pool-size: 20
+        max-pool-size: 50
+        keep-alive-time: 60   # 秒
+        block-queue-size: 5000
+        policy: CallerRunsPolicy
+
 #seata:
 #  tx-service-group: ${spring.application.name}-group
 #  service:

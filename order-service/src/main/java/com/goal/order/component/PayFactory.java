@@ -27,6 +27,18 @@ public class PayFactory {
         return null;
     }
 
+    public String querySuccess(PayInfoVO payInfoVO) {
+        String payType = payInfoVO.getPayType();
+
+        if (payType.equalsIgnoreCase(PayTypeEnum.ALIPAY.name())) {
+            PayStrategyContext payStrategyContext = new PayStrategyContext(alipayStrategy);
+
+            return payStrategyContext.executeQueryPaySuccess(payInfoVO);
+        }
+
+        return null;
+    }
+
 }
 
 

@@ -2,6 +2,7 @@ package com.goal.order.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.goal.constant.TimeConstant;
 import com.goal.domain.LoginUser;
 import com.goal.domain.mq.TimeoutCloseOrderMessage;
 import com.goal.enums.BizCodeEnum;
@@ -21,6 +22,7 @@ import com.goal.order.domain.po.ProductOrder;
 import com.goal.order.domain.po.ProductOrderItem;
 import com.goal.order.domain.vo.CartItemVO;
 import com.goal.order.domain.vo.CouponRecordVO;
+import com.goal.order.domain.vo.PayInfoVO;
 import com.goal.order.domain.vo.ProductOrderAddressVO;
 import com.goal.order.feign.CouponFeignService;
 import com.goal.order.feign.ProductCartFeignService;
@@ -142,10 +144,16 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         timeoutCloseOrderMessage.setOutTradeNo(orderTradeNo);
         rabbitMQService.sendMessageToDelayQueue(timeoutCloseOrderMessage);
 
-        // TODO 创建支付
-        String payInfo = "";
+        // 创建支付
+        PayInfoVO payInfoVO = new PayInfoVO(orderTradeNo, productOrder.getPayPrice(), orderConfirmDTO.getPayType(),
+                orderConfirmDTO.getClientType(), "orderOutTradeNo", "",
+                TimeConstant.ORDER_PAY_TIMEOUT_MILLS);
+        String payResult = payFactory.pay(payInfoVO);
+        if (StringUtils.isBlank(payResult)) {
+            return Result.fail(BizCodeEnum.PAY_ORDER_FAIL);
+        }
 
-        return Result.success(payInfo);
+        return Result.success(payResult);
     }
 
     /**
@@ -404,7 +412,11 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         }
 
         // TODO: 2024/6/11 向第三方发送请求查询订单是否支付
-        String payResult = "";
+        PayInfoVO payInfoVO = new PayInfoVO();
+        payInfoVO.setOutTradeNo(outTradeNo);
+        payInfoVO.setPayType(productOrder.getPayType());
+
+        String payResult = payFactory.querySuccess(payInfoVO);
         if (StringUtils.isBlank(payResult)) {
             // 订单未支付，超时关单，变更订单状态
             int rows = productOrderMapper.updateOrderPayStatus(outTradeNo, ProductOrderStateEnum.CANCEL.name(),
