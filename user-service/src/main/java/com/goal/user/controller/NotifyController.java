@@ -1,8 +1,8 @@
 package com.goal.user.controller;
 
+import com.goal.constant.RedisConstant;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
-import com.goal.user.common.RedisConstants;
 import com.goal.user.service.NotifyService;
 import com.goal.utils.CommonUtil;
 import com.goal.utils.Result;
@@ -52,7 +52,7 @@ public class NotifyController {
 
         // 缓存验证码
         redisTemplate.opsForValue().set(getCaptchaKey(request), kaptchaProducerText,
-                RedisConstants.USER_CAPTCHA_KEY_TTL, TimeUnit.MILLISECONDS);
+                RedisConstant.USER_CAPTCHA_KEY_TTL, TimeUnit.MILLISECONDS);
 
         // 根据文本生成图形验证码
         BufferedImage bufferedImage = captchaProducer.createImage(kaptchaProducerText);
@@ -73,7 +73,7 @@ public class NotifyController {
         String ipAddr = CommonUtil.getIpAddr(request);
         String userAgent = request.getHeader("User-Agent");
 
-        String key = RedisConstants.USER_CAPTCHA_KEY + CommonUtil.MD5(ipAddr + userAgent);
+        String key = RedisConstant.USER_CAPTCHA_KEY + CommonUtil.MD5(ipAddr + userAgent);
         log.info("User-Agent={}", userAgent);
         log.info("IP={}", ipAddr);
         log.info("缓存验证码, key：{}", key);

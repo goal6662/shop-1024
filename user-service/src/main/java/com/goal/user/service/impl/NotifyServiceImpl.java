@@ -1,8 +1,8 @@
 package com.goal.user.service.impl;
 
+import com.goal.constant.RedisConstant;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
-import com.goal.user.common.RedisConstants;
 import com.goal.user.component.MailService;
 import com.goal.user.service.NotifyService;
 import com.goal.utils.CheckUtil;
@@ -54,7 +54,7 @@ public class NotifyServiceImpl implements NotifyService {
         // 缓存验证码
         String content = String.format(CONTENT, code);
         redisTemplate.opsForValue().set(registerKey, code,
-                RedisConstants.USER_REGISTER_KEY_TTL, TimeUnit.MILLISECONDS);
+                RedisConstant.USER_REGISTER_KEY_TTL, TimeUnit.MILLISECONDS);
 
         if (CheckUtil.isEmail(to)) {
             // 发送验证码

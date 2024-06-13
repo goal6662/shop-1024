@@ -3,11 +3,11 @@ package com.goal.user.service.impl;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.goal.constant.RedisConstant;
 import com.goal.domain.LoginUser;
 import com.goal.domain.RefreshableToken;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.SendCodeEnum;
-import com.goal.user.common.RedisConstants;
 import com.goal.user.domain.User;
 import com.goal.user.domain.dto.CouponNewUserDTO;
 import com.goal.user.domain.dto.UserLoginDTO;
@@ -216,7 +216,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      */
     private Result getRefreshResult(LoginUser loginUser) {
         String accessToken = JwtUtil.genJwtToken(loginUser);
-        String refreshToken = JwtUtil.genJwtToken(loginUser, RedisConstants.REFRESH_TOKEN_TTL);
+        String refreshToken = JwtUtil.genJwtToken(loginUser, RedisConstant.REFRESH_TOKEN_TTL);
 
         RefreshableToken token = new RefreshableToken(accessToken, refreshToken);
 
@@ -226,7 +226,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         // 缓存 refreshToken
         redisTemplate.opsForValue().set(refreshToken, "1",
-                RedisConstants.REFRESH_TOKEN_TTL, TimeUnit.MILLISECONDS);
+                RedisConstant.REFRESH_TOKEN_TTL, TimeUnit.MILLISECONDS);
 
         return Result.success(token);
 
