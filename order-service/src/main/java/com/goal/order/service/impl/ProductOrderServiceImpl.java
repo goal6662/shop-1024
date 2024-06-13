@@ -411,22 +411,24 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
             return true;
         }
 
-        // TODO: 2024/6/11 向第三方发送请求查询订单是否支付
+        // 向第三方发送请求查询订单是否支付
         PayInfoVO payInfoVO = new PayInfoVO();
         payInfoVO.setOutTradeNo(outTradeNo);
         payInfoVO.setPayType(productOrder.getPayType());
 
         String payResult = payFactory.querySuccess(payInfoVO);
-        if (StringUtils.isBlank(payResult)) {
-            // 订单未支付，超时关单，变更订单状态
-            int rows = productOrderMapper.updateOrderPayStatus(outTradeNo, ProductOrderStateEnum.CANCEL.name(),
-                    ProductOrderStateEnum.CANCEL.name());
-            log.info("订单未支付，取消订单：{}", closeOrderMessage);
-        } else {
+        if (StringUtils.isNotBlank(payResult) &&
+                (AliPayConstants.TRADE_SUCCESS.equalsIgnoreCase(payResult)
+                        || AliPayConstants.TRADE_FINISH.equals(payResult))) {
             // 订单支付成功
             int rows = productOrderMapper.updateOrderPayStatus(outTradeNo, ProductOrderStateEnum.PAY.name(),
                     ProductOrderStateEnum.NEW.name());
             log.warn("订单支付成功，之前未接受到回调信息，注意排查：{}", closeOrderMessage);
+        } else {
+            // 订单未支付，超时关单，变更订单状态
+            int rows = productOrderMapper.updateOrderPayStatus(outTradeNo, ProductOrderStateEnum.CANCEL.name(),
+                    ProductOrderStateEnum.NEW.name());
+            log.info("订单未支付，取消订单：{}", closeOrderMessage);
         }
         return true;
     }

@@ -31,7 +31,7 @@ spring:
     virtual-host: ${shop.rabbitmq.virtual-host}
     listener:
       simple:
-        prefetch: 1   # 预拉取消息数1：当前1条消息处理完成后，才能继续接收消息
+#        prefetch: 1   # 预拉取消息数1：当前1条消息处理完成后，才能继续接收消息
         acknowledge-mode: manual  # 手动确认消息
 mybatis-plus:
   configuration:

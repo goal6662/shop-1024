@@ -51,7 +51,7 @@ public class ProductOrderController {
             if (payType.equalsIgnoreCase(PayTypeEnum.ALIPAY.name())) {
                 log.info("创建支付宝订单成功：{}", result.getData());
 
-                if (client.equalsIgnoreCase(ClientTypeEnum.APP.name())) {
+                if (client.equalsIgnoreCase(ClientTypeEnum.WEB.name())) {
                     // 写回html数据
                     writeData(response, result);
                 } else {

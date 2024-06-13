@@ -3,7 +3,6 @@ package com.goal.order.component.strategy;
 import cn.hutool.json.JSONUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
-import com.alipay.api.domain.AlipayTradePrecreateModel;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
@@ -21,8 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +45,7 @@ public class AlipayStrategy implements PayStrategy {
     @Override
     public String unifiedOrder(PayInfoVO payInfoVO) {
         // 下单
-        String bizContent = createTizContent(payInfoVO);
+        String bizContent = createBizContent(payInfoVO);
 
         String clientType = payInfoVO.getClientType();
         String form = "";
@@ -66,7 +63,7 @@ public class AlipayStrategy implements PayStrategy {
                 }
             } else if (clientType.equalsIgnoreCase(ClientTypeEnum.WEB.name())) {
                 AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
-                request.setBizContent(JSONUtil.toJsonStr(request));
+                request.setBizContent(bizContent);
                 request.setNotifyUrl(notifyUrl);
                 request.setReturnUrl(returnUrl);
 
@@ -87,7 +84,7 @@ public class AlipayStrategy implements PayStrategy {
             }
         }
 
-        return null;
+        return form;
     }
 
     @Override
@@ -96,11 +93,11 @@ public class AlipayStrategy implements PayStrategy {
         // 查询已支付未通知订单
         // 1. 创建订单请求
         AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        Map<String, String> content = new HashMap<>();
+        // 订单号
+        content.put("out_trade_no", payInfoVO.getOutTradeNo());
         // 1.1 添加请求信息
-        AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
-        model.setOutTradeNo(payInfoVO.getOutTradeNo());
-        // 1.2 添加至请求
-        request.setBizModel(model);
+        request.setBizContent(JSONUtil.toJsonStr(content));
 
         // 2. 发送查询请求
         AlipayTradeQueryResponse response = null;
@@ -126,7 +123,7 @@ public class AlipayStrategy implements PayStrategy {
      * @param payInfoVO
      * @return
      */
-    private String createTizContent(PayInfoVO payInfoVO) {
+    private String createBizContent(PayInfoVO payInfoVO) {
         Map<String, String> content = new HashMap<>();
         // 订单号
         content.put("out_trade_no", payInfoVO.getOutTradeNo());
@@ -145,7 +142,7 @@ public class AlipayStrategy implements PayStrategy {
         if (timeout < 1) {
             throw new BizException(BizCodeEnum.PAY_ORDER_TIMEOUT);
         }
-        content.put("timeout_express", timeout + "m");
+        content.put("timeout_express", Double.valueOf(timeout).intValue() + "m");
 
         return JSONUtil.toJsonStr(content);
     }

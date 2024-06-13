@@ -38,7 +38,7 @@
     </update>
     <select id="getStateByOutTradeNo" resultType="com.goal.order.domain.po.ProductOrder">
         select
-            state
+            state, pay_type
         from
             shop_order.product_order
         where
