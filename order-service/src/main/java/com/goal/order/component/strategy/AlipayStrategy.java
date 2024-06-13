@@ -3,9 +3,12 @@ package com.goal.order.component.strategy;
 import cn.hutool.json.JSONUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.domain.AlipayTradePrecreateModel;
 import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradePagePayResponse;
+import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.order.ClientTypeEnum;
@@ -18,6 +21,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,6 +88,37 @@ public class AlipayStrategy implements PayStrategy {
         }
 
         return null;
+    }
+
+    @Override
+    public String queryPaySuccess(PayInfoVO payInfoVO) {
+
+        // 查询已支付未通知订单
+        // 1. 创建订单请求
+        AlipayTradeQueryRequest request = new AlipayTradeQueryRequest();
+        // 1.1 添加请求信息
+        AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
+        model.setOutTradeNo(payInfoVO.getOutTradeNo());
+        // 1.2 添加至请求
+        request.setBizModel(model);
+
+        // 2. 发送查询请求
+        AlipayTradeQueryResponse response = null;
+        try {
+            response = alipayClient.execute(request);
+        } catch (AlipayApiException e) {
+            log.error("查询订单支付状态异常：{}", e.toString());
+        }
+
+        // 3. 返回订单状态
+        if (response != null && response.isSuccess()) {
+            String tradeStatus = response.getTradeStatus();
+            log.error("查询订单支付状态成功：{}，状态：{}", payInfoVO, tradeStatus);
+            return tradeStatus;
+        } else {
+            log.error("查询订单支付状态失败：{}", payInfoVO);
+            return "";
+        }
     }
 
     /**
