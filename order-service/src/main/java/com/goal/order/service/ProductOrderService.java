@@ -7,6 +7,8 @@ import com.goal.order.domain.po.ProductOrder;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.goal.utils.Result;
 
+import java.util.Map;
+
 /**
 * @author Goal
 * @description 针对表【product_order】的数据库操作Service
@@ -48,4 +50,12 @@ public interface ProductOrderService extends IService<ProductOrder> {
      * @return 信息是否被处理
      */
     boolean recoveryCartItems(CartRecoveryMessage recoveryMessage);
+
+    /**
+     * 处理支付回调信息
+     * @param payType 支付方式
+     * @param paramsMap 消息参数
+     * @return 处理结果
+     */
+    Result handlerOrderCallbackMsg(String payType, Map<String, String> paramsMap);
 }

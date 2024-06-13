@@ -10,6 +10,7 @@ import com.goal.enums.order.PayTypeEnum;
 import com.goal.enums.order.ProductOrderStateEnum;
 import com.goal.enums.order.ProductOrderTypeEnum;
 import com.goal.exception.BizException;
+import com.goal.order.component.PayFactory;
 import com.goal.order.domain.dto.CartItemDTO;
 import com.goal.order.domain.dto.CouponLockDTO;
 import com.goal.order.domain.dto.OrderConfirmDTO;
@@ -24,36 +25,35 @@ import com.goal.order.feign.CouponFeignService;
 import com.goal.order.feign.ProductCartFeignService;
 import com.goal.order.feign.UserFeignService;
 import com.goal.order.mapper.ProductOrderItemMapper;
+import com.goal.order.mapper.ProductOrderMapper;
 import com.goal.order.mq.RabbitMQService;
 import com.goal.order.service.ProductOrderService;
-import com.goal.order.mapper.ProductOrderMapper;
 import com.goal.utils.CommonUtil;
 import com.goal.utils.Result;
 import com.goal.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
-* @author Goal
-* @description 针对表【product_order】的数据库操作Service实现
-* @createDate 2024-06-06 16:42:25
-*/
+ * @author Goal
+ * @description 针对表【product_order】的数据库操作Service实现
+ * @createDate 2024-06-06 16:42:25
+ */
 @Slf4j
 @Service
 public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, ProductOrder>
-    implements ProductOrderService{
+        implements ProductOrderService {
 
     @Resource
     private ProductOrderMapper productOrderMapper;
@@ -73,6 +73,12 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     @Resource
     private CouponFeignService couponFeignService;
 
+    @Resource
+    private PayFactory payFactory;
+
+    @Resource
+    private ThreadPoolTaskExecutor taskExecutor;
+
     /**
      * TODO 可以使用线程池异步执行的有：购物车情空、优惠券锁定、商品库存锁定、订单验价
      * 防止重复提交
@@ -86,6 +92,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
      * 创建订单对象
      * 发送延迟消息-用于自动关单 [请在 15min 支付订单，超时订单将自动取消]
      * 创建支付消息-对接第三方支付
+     *
      * @param orderConfirmDTO
      * @return
      */
@@ -135,16 +142,17 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         rabbitMQService.sendMessageToDelayQueue(timeoutCloseOrderMessage);
 
         // TODO 创建支付
+        String payInfo = "";
 
-
-        return null;
+        return Result.success(payInfo);
     }
 
     /**
      * 发送 恢复购物车 购物项 的消息
+     *
      * @param cartItemVOList 购物项
-     * @param orderTradeNo 订单号
-     * @param userId 用户ID
+     * @param orderTradeNo   订单号
+     * @param userId         用户ID
      */
     private void sendCartRecoveryMessage(List<CartItemVO> cartItemVOList, String orderTradeNo, Long userId) {
 
@@ -214,6 +222,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     /**
      * 锁定库存
+     *
      * @param cartItemVOList 购物项
      * @param orderTradeNo
      */
@@ -241,6 +250,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     /**
      * 锁定优惠券
+     *
      * @param orderConfirmDTO
      * @param orderTradeNo
      */
@@ -263,7 +273,8 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     /**
      * 验证价格
-     * @param cartItemVOList 购买商品
+     *
+     * @param cartItemVOList  购买商品
      * @param orderConfirmDTO 请求
      */
     private void checkPrice(List<CartItemVO> cartItemVOList, OrderConfirmDTO orderConfirmDTO) {
@@ -340,6 +351,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     /**
      * 根据ID获取收货地址详情
+     *
      * @return
      */
     private ProductOrderAddressVO getUserAddress(Long addressId) {
@@ -408,6 +420,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     /**
      * 远程调用不成功需要消息重新入队
+     *
      * @param recoveryMessage 购物项信息
      * @return
      */
@@ -428,6 +441,12 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         }
 
         return true;
+    }
+
+    @Override
+    public Result handlerOrderCallbackMsg(String payType, Map<String, String> paramsMap) {
+        // TODO: 2024/6/13 处理支付回调 
+        return null;
     }
 }
 

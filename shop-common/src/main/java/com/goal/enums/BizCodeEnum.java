@@ -59,6 +59,10 @@ public enum BizCodeEnum {
     ORDER_SUBMIT_CART_ITEM_NOT_EXIST(280002, "购物车商品不存在"),
     ORDER_PRICE_CHANGE(28003, "商品价格更新了，请重新下单"),
 
+    /**
+     * 支付相关
+     */
+    PAY_ORDER_TIMEOUT(290001, "订单超时未支付"),
 
     /**
      * 优惠券相关
