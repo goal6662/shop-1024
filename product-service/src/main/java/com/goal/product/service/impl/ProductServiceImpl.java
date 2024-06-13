@@ -23,6 +23,7 @@ import com.goal.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -87,7 +88,13 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
         return products.stream().map(this::transferToVO).collect(Collectors.toList());
     }
 
+    /**
+     * 锁定商品库存
+     * @param productLockDTO
+     * @return
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result lockProducts(ProductLockDTO productLockDTO) {
 
         Long userId = UserContext.getUser().getId();
@@ -144,6 +151,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean releaseProductStock(ProductMessage productMessage) {
         // 1. 查找任务单是否存在
         ProductTask productTask = productTaskMapper.selectById(productMessage.getTaskId());

@@ -155,6 +155,7 @@ public class CouponRecordServiceImpl extends ServiceImpl<CouponRecordMapper, Cou
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean releaseCouponRecord(CouponRecordMessage couponRecordMessage) {
         // 释放优惠券记录
         // 1. 查找任务task释放存在

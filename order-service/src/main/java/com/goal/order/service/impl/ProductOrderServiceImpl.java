@@ -116,7 +116,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
         List<CartItemVO> cartItemVOList;
         if (result.getCode() != BizCodeEnum.OPS_SUCCESS.getCode()
-                || (cartItemVOList = result.getData()) == null) {
+                || (cartItemVOList = result.getData()) == null || cartItemVOList.isEmpty()) {
             throw new BizException(BizCodeEnum.ORDER_SUBMIT_CART_ITEM_NOT_EXIST);
         }
         // TODO: 2024/6/11 发送定时任务，恢复购物项
@@ -396,6 +396,7 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean timeoutCloseOrder(TimeoutCloseOrderMessage closeOrderMessage) {
         String outTradeNo = closeOrderMessage.getOutTradeNo();
         // 1. 查询订单状态
