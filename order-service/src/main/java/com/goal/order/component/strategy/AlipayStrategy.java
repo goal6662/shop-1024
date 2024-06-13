@@ -1,10 +1,23 @@
 package com.goal.order.component.strategy;
 
+import cn.hutool.json.JSONUtil;
+import com.alipay.api.AlipayApiException;
+import com.alipay.api.AlipayClient;
+import com.alipay.api.request.AlipayTradePagePayRequest;
+import com.alipay.api.request.AlipayTradeWapPayRequest;
+import com.alipay.api.response.AlipayTradePagePayResponse;
+import com.alipay.api.response.AlipayTradeWapPayResponse;
+import com.goal.enums.BizCodeEnum;
+import com.goal.enums.order.ClientTypeEnum;
+import com.goal.exception.BizException;
 import com.goal.order.component.PayStrategy;
 import com.goal.order.domain.vo.PayInfoVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,14 +25,72 @@ import java.util.Map;
 @Service
 public class AlipayStrategy implements PayStrategy {
 
+    @Value("${alipay.config.notify-url}")
+    private String notifyUrl;
+
+    @Value("${alipay.config.return-url}")
+    private String returnUrl;
+
+    @Resource
+    private AlipayClient alipayClient;
+
     /**
      * 下单
+     *
      * @param payInfoVO
      * @return
      */
     @Override
     public String unifiedOrder(PayInfoVO payInfoVO) {
-        // TODO: 2024/6/12 下单
+        // 下单
+        String bizContent = createTizContent(payInfoVO);
+
+        String clientType = payInfoVO.getClientType();
+        String form = "";
+        try {
+            if (clientType.equalsIgnoreCase(ClientTypeEnum.APP.name())) {
+                // H5 手机网页支付
+                AlipayTradeWapPayRequest request = new AlipayTradeWapPayRequest();
+                request.setBizContent(bizContent);
+                request.setNotifyUrl(notifyUrl);
+                request.setReturnUrl(returnUrl);
+
+                AlipayTradeWapPayResponse payResponse = alipayClient.execute(request);
+                if (payResponse.isSuccess()) {
+                    form = payResponse.getBody();
+                }
+            } else if (clientType.equalsIgnoreCase(ClientTypeEnum.WEB.name())) {
+                AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
+                request.setBizContent(JSONUtil.toJsonStr(request));
+                request.setNotifyUrl(notifyUrl);
+                request.setReturnUrl(returnUrl);
+
+                AlipayTradePagePayResponse payResponse = alipayClient.pageExecute(request);
+                if (payResponse.isSuccess()) {
+                    form = payResponse.getBody();
+                }
+            }
+
+        } catch (AlipayApiException e) {
+            log.error("支付宝构建{}表单异常：{}", clientType, e.toString());
+
+        } finally {
+            if (StringUtils.isBlank(form)) {
+                log.error("支付宝构建{}表单失败", clientType);
+            } else {
+                log.info("支付宝构建{}表单成功", clientType);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 请求数据
+     * @param payInfoVO
+     * @return
+     */
+    private String createTizContent(PayInfoVO payInfoVO) {
         Map<String, String> content = new HashMap<>();
         // 订单号
         content.put("out_trade_no", payInfoVO.getOutTradeNo());
@@ -32,10 +103,14 @@ public class AlipayStrategy implements PayStrategy {
         content.put("subject", payInfoVO.getTitle());
         // 商品描述
         content.put("body", payInfoVO.getDescription());
-        content.put("timeout_express", payInfoVO.getOrderPayTimeout().toString());
 
+        // 剩余支付时间：分钟，向下取整
+        double timeout = Math.floor(payInfoVO.getOrderPayTimeout() / (1000.0 * 60));
+        if (timeout < 1) {
+            throw new BizException(BizCodeEnum.PAY_ORDER_TIMEOUT);
+        }
+        content.put("timeout_express", timeout + "m");
 
-
-        return null;
+        return JSONUtil.toJsonStr(content);
     }
 }
