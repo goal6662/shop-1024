@@ -66,6 +66,7 @@ public enum BizCodeEnum {
     PAY_TYPE_NOT_SUPPORT(290002, "暂不支持该支付渠道"),
     PAY_ORDER_CALLBACK_FAIL(290003, "支付回调信息处理失败"),
     PAY_ORDER_TIMEOUT(290004, "订单超时未支付"),
+    PAY_ORDER_REPEAT(290005, "订单不存在或重复提交"),
 
     /**
      * 优惠券相关

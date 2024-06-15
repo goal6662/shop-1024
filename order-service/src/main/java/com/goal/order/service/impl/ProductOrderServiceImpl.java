@@ -39,12 +39,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -67,8 +70,8 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     @Resource
     private ProductOrderItemMapper productOrderItemMapper;
 
-    @Resource
-    private RedisTemplate redisTemplate;
+    @Resource(name = "stringRedisTemplate")
+    private StringRedisTemplate redisTemplate;
 
     @Resource
     private RabbitMQService rabbitMQService;
@@ -110,6 +113,10 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
     public Result submitOrder(OrderConfirmDTO orderConfirmDTO) {
 
         LoginUser loginUser = UserContext.getUser();
+
+        // 防止订单重复提交
+        this.rejectRepeatSubmit(orderConfirmDTO, loginUser);
+
         String orderTradeNo = CommonUtil.getStringNumRandom(32);
 
         // 获取收货地址信息
@@ -160,6 +167,31 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         }
 
         return Result.success(payResult);
+    }
+
+    /**
+     * 防止订单重复提交
+     * @param orderConfirmDTO
+     * @param loginUser
+     */
+    private void rejectRepeatSubmit(OrderConfirmDTO orderConfirmDTO, LoginUser loginUser) {
+
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then\n" +
+                "    return redis.call('del', KEYS[1])\n" +
+                "else\n" +
+                "    return 0\n" +
+                "end";
+
+        String orderKey = CacheKey.getSubmitOrderTokenKey(loginUser.getId());
+
+        // 获取成功会删除token
+        Long result = redisTemplate.execute(new DefaultRedisScript<>(script, Long.class),
+                List.of(orderKey), orderConfirmDTO.getToken());
+
+        if (result == null || result.compareTo(0L) == 0) {
+            throw new BizException(BizCodeEnum.PAY_ORDER_REPEAT);
+        }
+
     }
 
     /**
