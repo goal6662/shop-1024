@@ -1,12 +1,15 @@
 package com.goal.order.controller;
 
 import cn.hutool.http.ContentType;
+import com.goal.constant.CacheKey;
 import com.goal.enums.BizCodeEnum;
 import com.goal.enums.order.ClientTypeEnum;
 import com.goal.enums.order.PayTypeEnum;
 import com.goal.order.domain.dto.OrderConfirmDTO;
 import com.goal.order.service.ProductOrderService;
+import com.goal.utils.CommonUtil;
 import com.goal.utils.Result;
+import com.goal.utils.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,6 +37,11 @@ public class ProductOrderController {
        return productOrderService.getOrderStateByOutTradeNo(outTradeNo);
     }
 
+    @ApiOperation("获取提交订单令牌")
+    @GetMapping("get_token")
+    public Result<String> getOrderToken() {
+        return productOrderService.getSubmitToken();
+    }
 
     @ApiOperation("创建订单")
     @PostMapping("submit")

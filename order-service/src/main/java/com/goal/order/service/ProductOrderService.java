@@ -58,4 +58,10 @@ public interface ProductOrderService extends IService<ProductOrder> {
      * @return 处理结果
      */
     Result handlerOrderCallbackMsg(String payType, Map<String, String> paramsMap);
+
+    /**
+     * 生成下单token，并保存在redis
+     * @return token
+     */
+    Result<String> getSubmitToken();
 }

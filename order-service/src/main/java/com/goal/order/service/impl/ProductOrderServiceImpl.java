@@ -2,6 +2,7 @@ package com.goal.order.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.goal.constant.CacheKey;
 import com.goal.constant.TimeConstant;
 import com.goal.domain.LoginUser;
 import com.goal.domain.mq.TimeoutCloseOrderMessage;
@@ -37,6 +38,7 @@ import com.goal.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,6 +48,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +66,9 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
 
     @Resource
     private ProductOrderItemMapper productOrderItemMapper;
+
+    @Resource
+    private RedisTemplate redisTemplate;
 
     @Resource
     private RabbitMQService rabbitMQService;
@@ -468,6 +474,18 @@ public class ProductOrderServiceImpl extends ServiceImpl<ProductOrderMapper, Pro
         }
 
         return Result.fail(BizCodeEnum.PAY_TYPE_NOT_SUPPORT);
+    }
+
+    @Override
+    public Result<String> getSubmitToken() {
+        Long userId = UserContext.getUser().getId();
+
+        String orderTokenKey = CacheKey.getSubmitOrderTokenKey(userId);
+        String token = CommonUtil.getStringNumRandom(32);
+
+        redisTemplate.opsForValue().set(orderTokenKey, token, 30, TimeUnit.MINUTES);
+
+        return Result.success(token);
     }
 
     /**
